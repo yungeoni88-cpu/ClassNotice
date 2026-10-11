@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2026 대륜고 공지 - 2학년 4반</title>
+  <!-- 프리텐다드 폰트 CDN -->
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+  <!-- FontAwesome 아이콘 CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- CSS 분리 구조: 공통 베이스 스타일 & 카테고리별 컨텐츠 스타일 -->
+  <link rel="stylesheet" href="css/common.css">
+  <link rel="stylesheet" href="css/content.css">
+</head>
+<body>
+  <!-- 상단 컴팩트 플로팅 독 (가로 100%가 아닌 중앙 플로팅 아일랜드) -->
+  <div class="floating-hub-wrapper">
+    <header class="floating-hub" id="floatingHub">
+      <!-- 상단 브랜드 & 시간 정보 -->
+      <div class="hub-brand-row">
+        <div class="class-brand">
+          <span class="badge-grade">2학년 4반</span>
+          <h1 class="brand-title"><i class="fa-solid fa-school"></i> 2026 대륜고 공지</h1>
+        </div>
+        <div class="today-info">
+          <span id="currentDateDisplay" class="date-text">2026년 10월 11일 (일)</span>
+          <span id="currentTimeDisplay" class="time-text">21:56</span>
+        </div>
+      </div>
+
+      <!-- 일체형 카테고리 탭 네비게이션 -->
+      <nav class="hub-nav-row">
+        <button class="nav-tab active" data-tab="notice">
+          <i class="fa-solid fa-bullhorn"></i>
+          <span>공지사항</span>
+          <span class="badge-count" id="noticeBadge">3</span>
+        </button>
+        <button class="nav-tab" data-tab="schedule">
+          <i class="fa-regular fa-calendar-check"></i>
+          <span>학급일정</span>
+        </button>
+        <button class="nav-tab" data-tab="meal">
+          <i class="fa-solid fa-utensils"></i>
+          <span>급식표</span>
+        </button>
+        <button class="nav-tab" data-tab="etc">
+          <i class="fa-solid fa-shapes"></i>
+          <span>기타 & 생활</span>
+        </button>
+      </nav>
+    </header>
+  </div>
+
+  <!-- 메인 컨텐츠 영역 -->
+  <main class="main-content">
+
+    <!-- 1. 공지사항 섹션 -->
+    <section id="noticeSection" class="content-section active">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title"><i class="fa-solid fa-bullhorn"></i> 학급 공지사항</h2>
+          <p class="section-desc">선생님과 반장/부반장의 중요한 알림을 확인하세요.</p>
+        </div>
+        <div class="filter-controls">
+          <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="noticeSearchInput" placeholder="공지 내용 검색...">
+          </div>
+          <div class="tag-filters" id="noticeTagFilters">
+            <button class="filter-btn active" data-filter="all">전체</button>
+            <button class="filter-btn" data-filter="필독">🚨 필독</button>
+            <button class="filter-btn" data-filter="과제">📝 과제/학업</button>
+            <button class="filter-btn" data-filter="행사">🎈 행사/체험</button>
+            <button class="filter-btn" data-filter="준비물">🎒 준비물</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 공지사항 카드 리스트 동적 렌더링 영역 -->
+      <div class="notice-list-container" id="noticeListContainer">
+        <!-- JS에서 렌더링 -->
+      </div>
+    </section>
+
+
+    <!-- 2. 학급일정 섹션 -->
+    <section id="scheduleSection" class="content-section">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title"><i class="fa-regular fa-calendar-check"></i> 학급 일정 및 D-Day</h2>
+          <p class="section-desc">주요 시험, 행사, 수행평가 마감일을 한눈에 확인하세요.</p>
+        </div>
+      </div>
+
+      <!-- D-Day 카운터 요약 카드 그리드 -->
+      <div class="dday-card-grid" id="ddayCardGrid">
+        <!-- JS에서 렌더링 -->
+      </div>
+
+      <!-- 캘린더 및 상세 일정 리스트 그리드 -->
+      <div class="schedule-layout-grid">
+        <!-- 미니 캘린더 -->
+        <div class="card-box calendar-box">
+          <div class="calendar-header">
+            <button id="prevMonthBtn" class="icon-btn"><i class="fa-solid fa-chevron-left"></i></button>
+            <h3 id="calendarMonthTitle" class="calendar-title">2026. 10</h3>
+            <button id="nextMonthBtn" class="icon-btn"><i class="fa-solid fa-chevron-right"></i></button>
+          </div>
+          <div class="calendar-weekdays">
+            <span class="sun">일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span class="sat">토</span>
+          </div>
+          <div class="calendar-days" id="calendarDaysGrid">
+            <!-- JS 동적 생성 -->
+          </div>
+        </div>
+
+        <!-- 이번 달 주요 일정 목록 -->
+        <div class="card-box upcoming-box">
+          <h3 class="box-subtitle"><i class="fa-solid fa-list-check"></i> 다가오는 일정</h3>
+          <ul class="schedule-timeline" id="scheduleTimeline">
+            <!-- JS 동적 생성 -->
+          </ul>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- 3. 급식표 섹션 -->
+    <section id="mealSection" class="content-section">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title"><i class="fa-solid fa-utensils"></i> 학교 급식 식단표</h2>
+          <p class="section-desc">나이스(NEIS) 연동 급식 메뉴와 영양·원산지·알레르기 정보</p>
+        </div>
+        <div class="meal-school-meta" id="mealSchoolMeta">
+          <span class="meta-tag school-name" id="mealSchoolName"><i class="fa-solid fa-school"></i> 학교 정보 로딩중</span>
+          <span class="meta-tag feed-count" id="mealFeedCount"><i class="fa-solid fa-users"></i> 배식 인원</span>
+        </div>
+      </div>
+
+      <div class="meal-container">
+        <!-- 빠른 날짜 선택 칩 (API 데이터에 포함된 날짜들) -->
+        <div class="meal-quick-dates" id="mealQuickDates">
+          <!-- JS 동적 생성 -->
+        </div>
+
+        <!-- 날짜 이동 컨트롤러 -->
+        <div class="meal-date-bar">
+          <button id="prevMealDayBtn" class="btn-sub"><i class="fa-solid fa-chevron-left"></i> 이전 날</button>
+          <div class="meal-selected-date" id="mealSelectedDate">
+            <span id="mealDateText">식단표 불러오는 중...</span>
+            <span class="meal-status-tag" id="mealTodayBadge">오늘</span>
+          </div>
+          <button id="nextMealDayBtn" class="btn-sub">다음 날 <i class="fa-solid fa-chevron-right"></i></button>
+        </div>
+
+        <!-- 메인 급식 카드 (접기/펼치기 지원) -->
+        <div class="meal-card-main collapsible-card" id="mealMainCard">
+          <div class="meal-type-header" id="mealCardHeader">
+            <div class="meal-badge-group">
+              <span class="meal-badge" id="mealTypeName"><i class="fa-solid fa-bowl-rice"></i> 중식</span>
+              <span class="meal-date-badge" id="mealYmdBadge">2026.10.12</span>
+            </div>
+            <div class="card-header-actions">
+              <div class="meal-calorie-box">
+                <span class="cal-label">총 열량</span>
+                <span class="cal-value" id="mealKcalText">1024.6 Kcal</span>
+              </div>
+              <button class="card-collapse-btn" id="toggleMealBtn" type="button" title="식단표 접기/펼치기">
+                <span class="btn-text">접기</span>
+                <i class="fa-solid fa-chevron-up"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- 접혔을 때 한 줄 미니 프리뷰 -->
+          <div class="card-mini-preview" id="mealMiniPreview" style="display: none;">
+            <i class="fa-solid fa-utensils"></i>
+            <span class="preview-text" id="mealPreviewDishes">오늘의 식단표가 접혀 있습니다. 클릭하여 상세 메뉴 확인</span>
+            <span class="preview-badge"><i class="fa-solid fa-chevron-down"></i> 펼치기</span>
+          </div>
+
+          <!-- 접히는 본문 영역 -->
+          <div class="card-collapsible-body" id="mealCollapsibleBody">
+            <!-- 주요 3대 영양소 미니 요약 카드 -->
+            <div class="macro-nutrients-summary" id="macroNutrientsSummary">
+              <!-- JS 동적 생성 (탄수화물, 단백질, 지방) -->
+            </div>
+
+            <!-- 메뉴 리스트 -->
+            <h4 class="menu-list-title"><i class="fa-solid fa-list-ul"></i> 오늘의 메뉴</h4>
+            <div class="meal-menu-list" id="mealMenuList">
+              <!-- JS 동적 생성 -->
+            </div>
+
+            <!-- 세부 정보 탭 아코디언 (영양성분 / 원산지 / 알레르기) -->
+            <div class="meal-tabs-wrapper">
+              <div class="meal-info-tabs">
+                <button class="meal-subtab-btn active" data-subtab="nutrition"><i class="fa-solid fa-chart-pie"></i> 영양 성분</button>
+                <button class="meal-subtab-btn" data-subtab="origin"><i class="fa-solid fa-earth-asia"></i> 식재료 원산지</button>
+                <button class="meal-subtab-btn" data-subtab="allergy"><i class="fa-solid fa-circle-exclamation"></i> 알레르기 안내</button>
+              </div>
+
+              <!-- 1. 영양 성분 탭 내용 -->
+              <div class="meal-subtab-panel active" id="subtabNutritionPanel">
+                <div class="nutrition-grid" id="nutritionGrid">
+                  <!-- JS 동적 생성 -->
+                </div>
+              </div>
+
+              <!-- 2. 원산지 탭 내용 -->
+              <div class="meal-subtab-panel" id="subtabOriginPanel">
+                <div class="origin-tags-container" id="originTagsContainer">
+                  <!-- JS 동적 생성 -->
+                </div>
+              </div>
+
+              <!-- 3. 알레르기 가이드 탭 내용 -->
+              <div class="meal-subtab-panel" id="subtabAllergyPanel">
+                <div class="allergy-guide-grid" id="allergyGuideGrid">
+                  <!-- 알레르기 1~19번 번호표 -->
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+
+    <!-- 4. 기타 & 생활 섹션 -->
+    <section id="etcSection" class="content-section">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title"><i class="fa-solid fa-shapes"></i> 기타 & 학급 편의 기능</h2>
+          <p class="section-desc">시간표, 우리반 규칙, 유용한 학습 사이트 바로가기</p>
+        </div>
+      </div>
+
+      <div class="etc-grid">
+        <!-- 시간표 카드 (접기/펼치기 지원) -->
+        <div class="card-box timetable-box collapsible-card" id="timetableCard">
+          <div class="timetable-top-bar" id="timetableCardHeader">
+            <div class="timetable-title-group">
+              <h3 class="box-subtitle"><i class="fa-regular fa-clock"></i> <span id="timetableTitleText">오늘의 시간표</span></h3>
+              <button class="card-collapse-btn" id="toggleTimetableBtn" type="button" title="시간표 접기/펼치기">
+                <span class="btn-text">접기</span>
+                <i class="fa-solid fa-chevron-up"></i>
+              </button>
+            </div>
+            <div class="timetable-day-selector" id="timetableDaySelector">
+              <button class="day-chip-btn active" data-day="월">월</button>
+              <button class="day-chip-btn" data-day="화">화</button>
+              <button class="day-chip-btn" data-day="수">수</button>
+              <button class="day-chip-btn" data-day="목">목</button>
+              <button class="day-chip-btn" data-day="금">금</button>
+              <button class="day-chip-btn" data-day="all">전체</button>
+            </div>
+          </div>
+
+          <!-- 접혔을 때 한 줄 미니 프리뷰 -->
+          <div class="card-mini-preview" id="timetableMiniPreview" style="display: none;">
+            <i class="fa-regular fa-clock"></i>
+            <span class="preview-text" id="timetablePreviewText">시간표가 접혀 있습니다. 클릭하여 상세 시간표 확인</span>
+            <span class="preview-badge"><i class="fa-solid fa-chevron-down"></i> 펼치기</span>
+          </div>
+
+          <!-- 접히는 시간표 목록 영역 -->
+          <div class="card-collapsible-body" id="timetableCollapsibleBody">
+            <div class="timetable-list" id="timetableList">
+              <!-- JS 동적 생성 -->
+            </div>
+          </div>
+        </div>
+
+        <!-- 우리반 급훈 및 수칙 -->
+        <div class="card-box motto-box">
+          <h3 class="box-subtitle"><i class="fa-solid fa-star"></i> 우리반 급훈 & 약속</h3>
+          <blockquote class="motto-quote">
+            "서로를 존중하고, 오늘보다 내일 더 성장하는 우리"
+          </blockquote>
+          <ul class="class-rules">
+            <li><i class="fa-solid fa-check text-accent"></i> 8시 40분까지 아침 자습 착석하기</li>
+            <li><i class="fa-solid fa-check text-accent"></i> 쉬는 시간 및 이동 수업 시 교실 정리정돈</li>
+            <li><i class="fa-solid fa-check text-accent"></i> 수업 시간 전 스마트폰 제출함 확인</li>
+          </ul>
+        </div>
+
+        <!-- 유용한 사이트 바로가기 -->
+        <div class="card-box links-box">
+          <h3 class="box-subtitle"><i class="fa-solid fa-link"></i> 자주 찾는 링크</h3>
+          <div class="quick-links-grid">
+            <a href="https://www.ebs.co.kr" target="_blank" rel="noopener noreferrer" class="link-item">
+              <i class="fa-solid fa-graduation-cap"></i>
+              <span>EBS 온라인클래스</span>
+            </a>
+            <a href="https://classroom.google.com" target="_blank" rel="noopener noreferrer" class="link-item">
+              <i class="fa-brands fa-google"></i>
+              <span>구글 클래스룸</span>
+            </a>
+            <a href="#" class="link-item" onclick="alert('학교 홈페이지 주소를 연결해주세요.'); return false;">
+              <i class="fa-solid fa-school"></i>
+              <span>학교 홈페이지</span>
+            </a>
+            <a href="https://neis.go.kr" target="_blank" rel="noopener noreferrer" class="link-item">
+              <i class="fa-solid fa-landmark"></i>
+              <span>나이스 대국민서비스</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- 반 건의사항 / 분실물 게시판 미니 카드 -->
+        <div class="card-box feedback-box">
+          <h3 class="box-subtitle"><i class="fa-solid fa-comment-dots"></i> 한 줄 건의함 & 분실물</h3>
+          <form id="suggestionForm" class="feedback-form">
+            <input type="text" id="feedbackInput" placeholder="선생님 또는 반장에게 남길 말, 분실물 제보..." required>
+            <button type="submit" class="btn-primary"><i class="fa-solid fa-paper-plane"></i> 전송</button>
+          </form>
+          <div class="feedback-list" id="feedbackList">
+            <!-- 최근 등록된 메시지 표시 -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- 공지사항 상세 모달 (Popup) -->
+  <div class="modal-backdrop" id="noticeModalBackdrop">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <span class="modal-tag" id="modalTag">필독</span>
+        <h3 class="modal-title" id="modalTitle">공지사항 제목</h3>
+        <button class="modal-close" id="modalCloseBtn"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-meta">
+        <span id="modalAuthor"><i class="fa-solid fa-user"></i> 담임선생님</span>
+        <span id="modalDate"><i class="fa-regular fa-clock"></i> 2026. 10. 10</span>
+      </div>
+      <div class="modal-body" id="modalContent">
+        공지사항 상세 내용이 들어갑니다.
+      </div>
+      <div class="modal-footer">
+        <button class="btn-sub" id="modalConfirmBtn">확인 완료</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 푸터 -->
+  <footer class="app-footer">
+    <p>© 2026 우리반(2학년 4반) 공지 웹사이트 | 함께 만드는 즐거운 교실</p>
+  </footer>
+
+  <!-- 자바스크립트 분리 로드 -->
+  <!-- 카테고리별 독립 로직 (데이터 & 기능) -->
+  <script src="js/notice.js"></script>
+  <script src="js/schedule.js"></script>
+  <script src="js/meal.js"></script>
+  <script src="js/etc.js"></script>
+  <!-- 메인 컨트롤러 (탭 전환 및 전체 초기화) -->
+  <script src="js/main.js"></script>
+</body>
+</html>
