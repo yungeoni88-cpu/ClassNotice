@@ -273,6 +273,7 @@ async function initMealModule() {
   setupSubtabEvents();
   setupMealDateControls();
   renderAllergyGuide();
+  setupMealCollapseToggle();
 
   // 1. NEIS_CONFIG.KEY가 설정되어 있다면 실시간 API 호출 시도
   let liveApiData = null;
@@ -550,10 +551,21 @@ function renderMealCard(dateKey) {
   const mealTypeNameEl = document.getElementById("mealTypeName");
   const mealYmdBadgeEl = document.getElementById("mealYmdBadge");
   const mealKcalTextEl = document.getElementById("mealKcalText");
+  const mealPreviewTextEl = document.getElementById("mealPreviewDishes");
 
   if (mealTypeNameEl) mealTypeNameEl.innerHTML = `<i class="fa-solid fa-bowl-rice"></i> ${meal.mealName}`;
   if (mealYmdBadgeEl) mealYmdBadgeEl.textContent = dateKey;
   if (mealKcalTextEl) mealKcalTextEl.textContent = meal.calories;
+
+  // 접혔을 때 보일 미니 요약 텍스트
+  if (mealPreviewTextEl) {
+    if (meal.dishes.length > 0) {
+      const topDishes = meal.dishes.slice(0, 3).map(d => d.name).join(", ");
+      mealPreviewTextEl.textContent = `오늘의 식단: ${topDishes} 외... (${meal.calories})`;
+    } else {
+      mealPreviewTextEl.textContent = "등록된 식단 메뉴가 없습니다.";
+    }
+  }
 
   // 4. 3대 영양소 미니 요약 카드
   const macroSummaryEl = document.getElementById("macroNutrientsSummary");
@@ -747,6 +759,31 @@ function setupSubtabEvents() {
       });
     });
   });
+}
+
+/**
+ * 급식 카드 접기/펼치기 토글 이벤트 설정
+ */
+function setupMealCollapseToggle() {
+  const toggleBtn = document.getElementById("toggleMealBtn");
+  const miniPreview = document.getElementById("mealMiniPreview");
+  const bodyEl = document.getElementById("mealCollapsibleBody");
+  if (!toggleBtn || !bodyEl) return;
+
+  const toggleCard = () => {
+    const isCollapsed = bodyEl.classList.toggle("is-collapsed");
+    toggleBtn.classList.toggle("is-collapsed", isCollapsed);
+
+    const btnText = toggleBtn.querySelector(".btn-text");
+    if (btnText) btnText.textContent = isCollapsed ? "펼치기" : "접기";
+
+    if (miniPreview) {
+      miniPreview.style.display = isCollapsed ? "flex" : "none";
+    }
+  };
+
+  toggleBtn.addEventListener("click", toggleCard);
+  if (miniPreview) miniPreview.addEventListener("click", toggleCard);
 }
 
 /**

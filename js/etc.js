@@ -101,11 +101,37 @@ function initTimetableModule() {
   }
 
   setupTimetableDayButtons();
+  setupTimetableCollapseToggle();
   renderTimetable(currentSelectedDay);
 
   // 1초마다 실시간 시간표 배경 프로그레스 갱신
   if (timetableTimer) clearInterval(timetableTimer);
   timetableTimer = setInterval(updateTimetableLiveProgress, 1000);
+}
+
+/**
+ * 시간표 카드 접기/펼치기 토글 이벤트 설정
+ */
+function setupTimetableCollapseToggle() {
+  const toggleBtn = document.getElementById("toggleTimetableBtn");
+  const miniPreview = document.getElementById("timetableMiniPreview");
+  const bodyEl = document.getElementById("timetableCollapsibleBody");
+  if (!toggleBtn || !bodyEl) return;
+
+  const toggleCard = () => {
+    const isCollapsed = bodyEl.classList.toggle("is-collapsed");
+    toggleBtn.classList.toggle("is-collapsed", isCollapsed);
+
+    const btnText = toggleBtn.querySelector(".btn-text");
+    if (btnText) btnText.textContent = isCollapsed ? "펼치기" : "접기";
+
+    if (miniPreview) {
+      miniPreview.style.display = isCollapsed ? "flex" : "none";
+    }
+  };
+
+  toggleBtn.addEventListener("click", toggleCard);
+  if (miniPreview) miniPreview.addEventListener("click", toggleCard);
 }
 
 /**
@@ -282,6 +308,15 @@ function updateTimetableLiveProgress() {
             <span class="live-dot"></span> ${isLunch ? '점심시간' : '수업 중'} (${remainMin}분 남음)
           </span>
         `;
+
+        // 접힌 미니 프리뷰 텍스트 업데이트
+        const previewTextEl = document.getElementById("timetablePreviewText");
+        const subjectName = row.querySelector(".subject-name")?.textContent || "";
+        if (previewTextEl) {
+          previewTextEl.textContent = isLunch 
+            ? `현재 점심시간 진행 중 (${remainMin}분 남음)`
+            : `현재 수업 진행 중: ${subjectName} (${remainMin}분 남음)`;
+        }
       }
     } else if (currentMin >= endMin) {
       // 2) 이미 지난 교시

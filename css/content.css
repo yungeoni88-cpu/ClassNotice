@@ -527,6 +527,99 @@
   text-align: right;
 }
 
+.card-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.card-collapse-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.32rem 0.75rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  background-color: var(--bg-subtle);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.card-collapse-btn:hover {
+  background-color: var(--primary-light);
+  color: var(--primary-dark);
+  border-color: var(--primary-color);
+}
+
+.card-collapse-btn i {
+  font-size: 0.75rem;
+  transition: transform 0.25s ease;
+}
+
+.card-collapse-btn.is-collapsed i {
+  transform: rotate(180deg);
+}
+
+/* 접혔을 때 표시되는 한 줄 미니 프리뷰 바 */
+.card-mini-preview {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.85rem 1.1rem;
+  background-color: var(--bg-subtle);
+  border: 1px dashed var(--border-color);
+  border-radius: var(--radius-md);
+  margin-top: 0.5rem;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.card-mini-preview:hover {
+  background-color: var(--primary-light);
+  border-color: var(--primary-color);
+  color: var(--primary-dark);
+}
+
+.card-mini-preview .preview-text {
+  flex: 1;
+  font-weight: 600;
+  margin-left: 0.6rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.card-mini-preview .preview-badge {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  background-color: #ffffff;
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border-color);
+  white-space: nowrap;
+}
+
+/* 접히는 본문 영역 */
+.card-collapsible-body {
+  transition: opacity 0.3s ease;
+}
+
+.card-collapsible-body.is-collapsed {
+  display: none !important;
+}
+
+.timetable-title-group {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
 .cal-label {
   display: block;
   font-size: 0.75rem;
