@@ -1,163 +1,391 @@
 /**
  * [notice.js] 공지사항 카테고리 로직
- * - 공지사항 데이터 관리
- * - 검색 및 태그 필터링
- * - 상세 내용 모달 팝업 제어
+ * - 2학년 4반 오늘의 시간표 (1~7교시 및 점심시간 60분)
+ * - 현재 시간에 맞춰 N교시 배경이 왼쪽에서 오른쪽으로 실시간 차오르는 게이지 기능
+ * - 요일별 시간표 전환 및 아코디언 접기/펼치기
+ * - 학급 급훈&약속 및 자주 찾는 링크
  */
 
-// 초기 공지 데이터 (실제 서비스에서는 백엔드 API 또는 JSON 파일 연동)
-const noticeData = [
-  {
-    id: 1,
-    tag: "필독",
-    isImportant: true,
-    title: "10월 둘째 주 현장체험학습 안전 수칙 및 준비물 안내",
-    content: `안녕하세요, 2학년 4반 학생 여러분!\n\n이번 주 금요일 진행되는 가을 현장체험학습(에버랜드) 관련 안내사항입니다.\n\n1. 집합 시간: 오전 8시 20분 (교실 집합, 늦지 않도록 유의)\n2. 복장: 단정한 사복 (활동하기 편한 운동화 필수)\n3. 필수 준비물: 학생증, 개인 비상약, 보조배터리, 필기도구\n4. 유의사항:\n- 4인 1조 개별 이동 원칙 준수\n- 비상시 담임선생님 연락처(010-XXXX-XXXX)로 즉시 연락\n- 지정된 귀가 시간(오후 4시 정문 집합) 엄수`,
-    author: "담임선생님",
-    date: "2026-10-10",
-  },
-  {
-    id: 2,
-    tag: "과제",
-    isImportant: false,
-    title: "수학Ⅰ 2단원 삼각함수 수행평가 제출 기한 연장 안내",
-    content: `수학 수행평가 보고서 제출 기한이 이번 주 수요일(14일) 방과 후 5시까지로 1일 연장되었습니다.\n\n구글 클래스룸에 PDF 파일 형식으로 과제 번호와 이름을 적어 업로드해주세요.\n* 기한 이후 제출 시 감점 처리되니 미리 제출 바랍니다.`,
-    author: "수학부장",
-    date: "2026-10-09",
-  },
-  {
-    id: 3,
-    tag: "행사",
-    isImportant: false,
-    title: "교내 독서 골든벨 참가 신청 (10월 20일까지)",
-    content: `2학기 교내 독서 골든벨 행사에 참여할 학생은 반장에게 수요일까지 신청해 주시기 바랍니다.\n\n선정도서: '페인트', '클로버', '불편한 편의점'\n우수자에게는 상장 및 문화상품권이 지급됩니다!`,
-    author: "반장",
-    date: "2026-10-08",
-  },
-  {
-    id: 4,
-    tag: "준비물",
-    isImportant: false,
-    title: "미술 시간 수채화 도구 및 켄트지 지참 안내",
-    content: `내일(화요일) 3교시 미술 시간에는 풍경화 채색 작업이 진행됩니다.\n\n개인 붓, 팔레트, 물통을 반드시 챙겨오세요. 켄트지는 미술실에서 배부됩니다.`,
-    author: "미술부장",
-    date: "2026-10-07",
-  }
+// ==============================================================================
+// 1. 대륜고 2학년 4반 요일별 정규 시간표 데이터
+// ==============================================================================
+const weeklyTimetable = {
+  "월": [
+    "역학과 에너지",
+    "물질과 에너지",
+    "스포츠 문화",
+    "세포와 물질대사",
+    "화법과 언어",
+    "미적분II",
+    "영어 발표와 토론"
+  ],
+  "화": [
+    "영어II",
+    "일본어",
+    "확률과 통계",
+    "영어 발표와 토론",
+    "역학과 에너지",
+    "화법과 언어",
+    "미적분II"
+  ],
+  "수": [
+    "진로",
+    "영어II",
+    "확률과 통계",
+    "화법과 언어",
+    "동아리",
+    "자율"
+  ],
+  "목": [
+    "세포와 물질대사",
+    "역학과 에너지",
+    "미적분II",
+    "물질과 에너지",
+    "확률과 통계",
+    "영어II",
+    "일본어"
+  ],
+  "금": [
+    "일본어",
+    "화법과 언어",
+    "영어 발표와 토론",
+    "영어II",
+    "물질과 에너지",
+    "확률과 통계",
+    "세포와 물질대사"
+  ]
+};
+
+// 2. 정확한 교시별 시간표 스케줄 (쉬는시간 10분, 점심시간 60분)
+const periodSchedule = [
+  { id: "p1", periodNum: 1, label: "1교시", start: "08:30", end: "09:20" },
+  { id: "p2", periodNum: 2, label: "2교시", start: "09:30", end: "10:20" },
+  { id: "p3", periodNum: 3, label: "3교시", start: "10:30", end: "11:20" },
+  { id: "p4", periodNum: 4, label: "4교시", start: "11:30", end: "12:20" },
+  { id: "lunch", periodNum: "lunch", label: "점심시간", start: "12:20", end: "13:20" },
+  { id: "p5", periodNum: 5, label: "5교시", start: "13:20", end: "14:10" },
+  { id: "p6", periodNum: 6, label: "6교시", start: "14:20", end: "15:10" },
+  { id: "p7", periodNum: 7, label: "7교시", start: "15:20", end: "16:10" },
 ];
 
-let currentFilterTag = "all";
-let currentSearchKeyword = "";
+// 과목별 분류 태그 매핑 (시각적 구분)
+function getSubjectTag(subject) {
+  if (["역학과 에너지", "물질과 에너지", "세포와 물질대사"].includes(subject)) return "과학";
+  if (["미적분II", "확률과 통계"].includes(subject)) return "수학";
+  if (["화법과 언어"].includes(subject)) return "국어";
+  if (["영어II", "영어 발표와 토론"].includes(subject)) return "영어";
+  if (["일본어"].includes(subject)) return "외국어";
+  if (["스포츠 문화"].includes(subject)) return "체육";
+  if (["진로", "동아리", "자율"].includes(subject)) return "창체";
+  return "교과";
+}
+
+let currentSelectedDay = "월"; // 기본 선택 요일
+let timetableTimer = null; // 실시간 프로그레스 타이머
 
 // 공지사항 모듈 초기화
 function initNoticeModule() {
-  renderNoticeList();
-  setupNoticeEvents();
-  updateNoticeBadge();
+  initTimetableModule();
 }
 
-// 공지 뱃지 카운트 업데이트
-function updateNoticeBadge() {
-  const badge = document.getElementById("noticeBadge");
-  if (badge) {
-    badge.textContent = noticeData.length;
+/**
+ * 시간표 모듈 초기화
+ */
+function initTimetableModule() {
+  // 오늘 요일 감지 (월~금이 아니면 월요일로 기본 설정)
+  const days = ["일", "월", "화", "수", "목", "금", "토"];
+  const todayDayName = days[new Date().getDay()];
+
+  if (weeklyTimetable[todayDayName]) {
+    currentSelectedDay = todayDayName;
+  } else {
+    currentSelectedDay = "월";
   }
+
+  setupTimetableDayButtons();
+  setupTimetableCollapseToggle();
+  renderTimetable(currentSelectedDay);
+
+  // 1초마다 실시간 시간표 배경 프로그레스 갱신
+  if (timetableTimer) clearInterval(timetableTimer);
+  timetableTimer = setInterval(updateTimetableLiveProgress, 1000);
 }
 
-// 이벤트 리스너 등록
-function setupNoticeEvents() {
-  // 태그 필터 버튼 클릭
-  const filterButtons = document.querySelectorAll("#noticeTagFilters .filter-btn");
-  filterButtons.forEach(btn => {
-    btn.addEventListener("click", () => {
-      filterButtons.forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
-      currentFilterTag = btn.dataset.filter;
-      renderNoticeList();
-    });
-  });
+/**
+ * 시간표 카드 접기/펼치기 토글 이벤트 설정
+ */
+function setupTimetableCollapseToggle() {
+  const toggleBtn = document.getElementById("toggleTimetableBtn");
+  const miniPreview = document.getElementById("timetableMiniPreview");
+  const bodyEl = document.getElementById("timetableCollapsibleBody");
+  if (!toggleBtn || !bodyEl) return;
 
-  // 검색창 입력 이벤트
-  const searchInput = document.getElementById("noticeSearchInput");
-  if (searchInput) {
-    searchInput.addEventListener("input", (e) => {
-      currentSearchKeyword = e.target.value.trim().toLowerCase();
-      renderNoticeList();
-    });
-  }
+  const toggleCard = () => {
+    const isCollapsed = bodyEl.classList.toggle("is-collapsed");
+    toggleBtn.classList.toggle("is-collapsed", isCollapsed);
 
-  // 모달 닫기 버튼 이벤트
-  const modalBackdrop = document.getElementById("noticeModalBackdrop");
-  const modalCloseBtn = document.getElementById("modalCloseBtn");
-  const modalConfirmBtn = document.getElementById("modalConfirmBtn");
+    const btnText = toggleBtn.querySelector(".btn-text");
+    if (btnText) btnText.textContent = isCollapsed ? "펼치기" : "접기";
 
-  const closeModal = () => {
-    modalBackdrop.classList.remove("active");
+    if (miniPreview) {
+      miniPreview.style.display = isCollapsed ? "flex" : "none";
+    }
   };
 
-  if (modalCloseBtn) modalCloseBtn.addEventListener("click", closeModal);
-  if (modalConfirmBtn) modalConfirmBtn.addEventListener("click", closeModal);
-  if (modalBackdrop) {
-    modalBackdrop.addEventListener("click", (e) => {
-      if (e.target === modalBackdrop) closeModal();
-    });
-  }
+  toggleBtn.addEventListener("click", toggleCard);
+  if (miniPreview) miniPreview.addEventListener("click", toggleCard);
 }
 
-// 공지 목록 필터링 및 렌더링
-function renderNoticeList() {
-  const container = document.getElementById("noticeListContainer");
+/**
+ * 요일 선택 버튼 이벤트
+ */
+function setupTimetableDayButtons() {
+  const buttons = document.querySelectorAll("#timetableDaySelector .day-chip-btn");
+
+  buttons.forEach(btn => {
+    if (btn.dataset.day === currentSelectedDay) {
+      btn.classList.add("active");
+    } else {
+      btn.classList.remove("active");
+    }
+
+    btn.addEventListener("click", () => {
+      buttons.forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+
+      currentSelectedDay = btn.dataset.day;
+      renderTimetable(currentSelectedDay);
+    });
+  });
+}
+
+/**
+ * 시간 문자열(HH:MM)을 분 단위 실수로 변환
+ */
+function timeStrToMinutes(timeStr) {
+  const [h, m] = timeStr.split(":").map(Number);
+  return h * 60 + m;
+}
+
+/**
+ * 현재 시간을 분 단위 실수(초 포함)로 계산
+ */
+function getCurrentTimeMinutes() {
+  const now = new Date();
+  return now.getHours() * 60 + now.getMinutes() + now.getSeconds() / 60;
+}
+
+/**
+ * 시간표 렌더링 (단일 요일 카드 리스트 or 전체 주간 테이블)
+ */
+function renderTimetable(dayKey) {
+  const container = document.getElementById("timetableList");
+  const titleEl = document.getElementById("timetableTitleText");
   if (!container) return;
 
-  const filtered = noticeData.filter(item => {
-    const matchTag = (currentFilterTag === "all") || (item.tag === currentFilterTag);
-    const matchKeyword = currentSearchKeyword === "" || 
-      item.title.toLowerCase().includes(currentSearchKeyword) || 
-      item.content.toLowerCase().includes(currentSearchKeyword);
-    return matchTag && matchKeyword;
-  });
-
-  if (filtered.length === 0) {
-    container.innerHTML = `
-      <div class="empty-state">
-        <i class="fa-regular fa-folder-open"></i>
-        <p>조건에 맞는 공지사항이 없습니다.</p>
-      </div>
-    `;
+  // 1) 전체 주간 테이블 뷰인 경우
+  if (dayKey === "all") {
+    if (titleEl) titleEl.textContent = "주간 전체 시간표 (월~금)";
+    renderWeeklyTableView(container);
     return;
   }
 
-  container.innerHTML = filtered.map(item => `
-    <article class="notice-card ${item.isImportant ? 'is-important' : ''}" onclick="openNoticeModal(${item.id})">
-      <div class="notice-card-top">
-        <div class="notice-badges">
-          <span class="tag-badge ${item.isImportant ? 'important' : ''}">${item.isImportant ? '🚨 ' : ''}${item.tag}</span>
+  // 2) 특정 요일 뷰인 경우
+  const todayName = ["일", "월", "화", "수", "목", "금", "토"][new Date().getDay()];
+  const isToday = todayName === dayKey;
+  if (titleEl) {
+    titleEl.textContent = isToday ? `오늘의 시간표 (${dayKey})` : `${dayKey}요일 시간표`;
+  }
+
+  const subjects = weeklyTimetable[dayKey] || [];
+  if (subjects.length === 0) {
+    container.innerHTML = `<p class="empty-state">시간표 정보가 없습니다.</p>`;
+    return;
+  }
+
+  let html = "";
+  let subjectIdx = 0;
+
+  periodSchedule.forEach((item) => {
+    // 점심시간 행
+    if (item.periodNum === "lunch") {
+      html += `
+        <div class="period-row lunch-row" data-period-id="lunch" data-start="${item.start}" data-end="${item.end}">
+          <div class="period-progress-fill" style="width: 0%;"></div>
+          <div class="period-left-group">
+            <div class="period-col-info">
+              <span class="period-num"><i class="fa-solid fa-utensils"></i></span>
+              <span class="period-time-range">${item.start}~${item.end}</span>
+            </div>
+            <span class="subject-name">점심시간</span>
+          </div>
+          <div class="period-right-group">
+            <span class="live-status-container"></span>
+            <span class="subject-tag" style="background:#fef3c7; color:#92400e;">60분</span>
+          </div>
         </div>
-        <span class="notice-date">${item.date}</span>
+      `;
+      return;
+    }
+
+    // 과목 행 (수요일은 6교시까지만 있으므로 7교시는 제외)
+    const subject = subjects[subjectIdx];
+    subjectIdx++;
+
+    if (!subject) return;
+
+    const tag = getSubjectTag(subject);
+
+    html += `
+      <div class="period-row" data-period-id="p${item.periodNum}" data-start="${item.start}" data-end="${item.end}">
+        <div class="period-progress-fill" style="width: 0%;"></div>
+        <div class="period-left-group">
+          <div class="period-col-info">
+            <span class="period-num">${item.label}</span>
+            <span class="period-time-range">${item.start}~${item.end}</span>
+          </div>
+          <span class="subject-name">${subject}</span>
+        </div>
+        <div class="period-right-group">
+          <span class="live-status-container"></span>
+          <span class="subject-tag">${tag}</span>
+        </div>
       </div>
-      <h3 class="notice-title">
-        ${item.title}
-      </h3>
-      <p class="notice-preview">${item.content}</p>
-      <div class="notice-footer">
-        <span><i class="fa-solid fa-user-pen"></i> 작성자: ${item.author}</span>
-        <span>자세히 보기 <i class="fa-solid fa-chevron-right"></i></span>
-      </div>
-    </article>
-  `).join("");
+    `;
+  });
+
+  container.innerHTML = html;
+
+  // 렌더링 즉시 실시간 프로그레스 적용
+  updateTimetableLiveProgress();
 }
 
-// 공지사항 상세 모달 열기
-function openNoticeModal(id) {
-  const item = noticeData.find(n => n.id === id);
-  if (!item) return;
+/**
+ * 실시간 N교시 박스 배경 프로그레스(차오름) 갱신 함수
+ */
+function updateTimetableLiveProgress() {
+  const container = document.getElementById("timetableList");
+  if (!container) return;
 
-  const backdrop = document.getElementById("noticeModalBackdrop");
-  document.getElementById("modalTag").textContent = item.tag;
-  document.getElementById("modalTag").className = `modal-tag ${item.isImportant ? 'important' : ''}`;
-  document.getElementById("modalTitle").textContent = item.title;
-  document.getElementById("modalAuthor").innerHTML = `<i class="fa-solid fa-user"></i> ${item.author}`;
-  document.getElementById("modalDate").innerHTML = `<i class="fa-regular fa-clock"></i> ${item.date}`;
-  document.getElementById("modalContent").textContent = item.content;
+  const todayName = ["일", "월", "화", "수", "목", "금", "토"][new Date().getDay()];
+  const isViewingToday = currentSelectedDay === todayName;
 
-  backdrop.classList.add("active");
+  const rows = container.querySelectorAll(".period-row[data-start]");
+  if (!rows || rows.length === 0) return;
+
+  const currentMin = getCurrentTimeMinutes();
+
+  rows.forEach(row => {
+    const startStr = row.dataset.start;
+    const endStr = row.dataset.end;
+    const fillEl = row.querySelector(".period-progress-fill");
+    const liveContainer = row.querySelector(".live-status-container");
+
+    if (!isViewingToday) {
+      row.classList.remove("is-current", "is-past");
+      if (fillEl) fillEl.style.width = "0%";
+      if (liveContainer) liveContainer.innerHTML = "";
+      return;
+    }
+
+    const startMin = timeStrToMinutes(startStr);
+    const endMin = timeStrToMinutes(endStr);
+
+    if (currentMin >= startMin && currentMin < endMin) {
+      // 1) 현재 진행 중인 교시
+      const progress = ((currentMin - startMin) / (endMin - startMin)) * 100;
+      const remainMin = Math.ceil(endMin - currentMin);
+
+      row.classList.add("is-current");
+      row.classList.remove("is-past");
+      if (fillEl) fillEl.style.width = `${progress.toFixed(2)}%`;
+
+      if (liveContainer) {
+        const isLunch = row.dataset.periodId === "lunch";
+        liveContainer.innerHTML = `
+          <span class="live-status-pill">
+            <span class="live-dot"></span> ${isLunch ? '점심시간' : '수업 중'} (${remainMin}분 남음)
+          </span>
+        `;
+
+        const previewTextEl = document.getElementById("timetablePreviewText");
+        const subjectName = row.querySelector(".subject-name")?.textContent || "";
+        if (previewTextEl) {
+          previewTextEl.textContent = isLunch 
+            ? `현재 점심시간 진행 중 (${remainMin}분 남음)`
+            : `현재 수업 진행 중: ${subjectName} (${remainMin}분 남음)`;
+        }
+      }
+    } else if (currentMin >= endMin) {
+      // 2) 이미 지난 교시
+      row.classList.remove("is-current");
+      row.classList.add("is-past");
+      if (fillEl) fillEl.style.width = "100%";
+      if (liveContainer) liveContainer.innerHTML = "";
+    } else {
+      // 3) 아직 시작 전인 교시
+      row.classList.remove("is-current", "is-past");
+      if (fillEl) fillEl.style.width = "0%";
+      if (liveContainer) liveContainer.innerHTML = "";
+    }
+  });
+}
+
+/**
+ * 주간 전체 시간표 테이블 렌더링
+ */
+function renderWeeklyTableView(container) {
+  const days = ["월", "화", "수", "목", "금"];
+  const todayName = ["일", "월", "화", "수", "목", "금", "토"][new Date().getDay()];
+
+  let tableHtml = `
+    <div class="weekly-table-wrap">
+      <table class="weekly-table">
+        <thead>
+          <tr>
+            <th>교시 / 시간</th>
+            ${days.map(d => `<th class="${d === todayName ? 'today-col' : ''}">${d}${d === todayName ? ' (오늘)' : ''}</th>`).join("")}
+          </tr>
+        </thead>
+        <tbody>
+  `;
+
+  periodSchedule.forEach(item => {
+    if (item.periodNum === "lunch") {
+      tableHtml += `
+        <tr style="background-color: #fffbeb;">
+          <td style="font-weight:700; color:#b45309;"><i class="fa-solid fa-utensils"></i> 점심시간<br><span style="font-size:0.75rem; font-weight:normal;">${item.start}~${item.end}</span></td>
+          <td colspan="5" style="text-align:center; font-weight:700; color:#b45309; letter-spacing:0.05em;">
+            🍱 점심시간 (60분)
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    const pIdx = item.periodNum - 1;
+    tableHtml += `
+      <tr>
+        <td><strong>${item.label}</strong><br><span style="font-size:0.75rem; color:var(--text-light);">${item.start}~${item.end}</span></td>
+        ${days.map(d => {
+          const subj = (weeklyTimetable[d] && weeklyTimetable[d][pIdx]) ? weeklyTimetable[d][pIdx] : "-";
+          const tag = subj !== "-" ? getSubjectTag(subj) : "";
+          const isTodayCol = d === todayName;
+          return `
+            <td class="${isTodayCol ? 'today-col-cell' : ''}">
+              ${subj !== "-" ? `<span class="weekly-subj">${subj}</span><span class="weekly-tag">${tag}</span>` : `<span style="color:#cbd5e1;">-</span>`}
+            </td>
+          `;
+        }).join("")}
+      </tr>
+    `;
+  });
+
+  tableHtml += `
+        </tbody>
+      </table>
+    </div>
+  `;
+
+  container.innerHTML = tableHtml;
 }

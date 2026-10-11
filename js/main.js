@@ -87,10 +87,11 @@ function initTabNavigation() {
     });
   });
 
-  // URL 해시가 있는 경우 초기 탭 선택 (예: #meal, #schedule)
+  // URL 해시가 있는 경우 초기 탭 선택 (예: #meal, #schedule, #archive)
   const hash = window.location.hash.replace("#", "");
-  const validTabs = ["notice", "schedule", "meal", "etc"];
+  const validTabs = ["notice", "schedule", "meal", "archive", "etc"];
   if (hash && validTabs.includes(hash)) {
-    switchTab(hash);
+    const targetTab = hash === "etc" ? "archive" : hash;
+    switchTab(targetTab);
   }
 }
