@@ -3,11 +3,11 @@
    ======================================================== */
 
 :root {
-  /* 메인 색상 테마 (대륜고 시그니처 딥블루 #0a0c8c) */
-  --primary-color: #0a0c8c;
-  --primary-hover: #171ca6;
-  --primary-light: #eef0fb;
-  --primary-dark: #070866;
+  /* 메인 색상 테마 (#558061 포레스트/세이지 그린) */
+  --primary-color: #558061;
+  --primary-hover: #44684e;
+  --primary-light: #edf4ef;
+  --primary-dark: #36533e;
 
   --accent-color: #f59e0b;
   --accent-red: #ef4444;
@@ -24,7 +24,7 @@
   --text-light: #94a3b8;
 
   --border-color: #e2e8f0;
-  --border-focus: #b4bcf8;
+  --border-focus: #b2ccb9;
 
   /* 섀도우 & 라운딩 */
   --radius-sm: 8px;
@@ -83,9 +83,9 @@ input, textarea {
    ======================================================== */
 .app-header {
   width: 100%;
-  background: linear-gradient(135deg, #0a0c8c 0%, #171ca6 100%);
+  background: linear-gradient(135deg, #558061 0%, #44684e 100%);
   color: #ffffff;
-  box-shadow: 0 4px 20px rgba(10, 12, 140, 0.22);
+  box-shadow: 0 4px 20px rgba(85, 128, 97, 0.22);
   position: sticky;
   top: 0;
   z-index: 50;

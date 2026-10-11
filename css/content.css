@@ -160,11 +160,6 @@
   box-shadow: var(--shadow-md);
 }
 
-.dday-card.urgent {
-  background-color: #ffffff !important; /* 붉은빛 그라데이션 제거, 순수 화이트로 통일 */
-  border-color: var(--border-color);
-}
-
 .dday-info h4 {
   font-size: 1rem;
   font-weight: 700;
@@ -184,11 +179,6 @@
   background-color: var(--primary-light);
   padding: 0.35rem 0.75rem;
   border-radius: var(--radius-md);
-}
-
-.dday-card.urgent .dday-number {
-  color: var(--accent-red);
-  background-color: #fee2e2;
 }
 
 .schedule-layout-grid {
@@ -292,7 +282,7 @@
   color: var(--primary-color) !important;
   font-weight: 800 !important;
   border: 2px solid var(--primary-color) !important;
-  box-shadow: 0 0 0 2px rgba(10, 12, 140, 0.25);
+  box-shadow: 0 0 0 2px rgba(85, 128, 97, 0.25);
   transform: scale(1.04);
 }
 
@@ -411,7 +401,7 @@
   border-radius: var(--radius-full);
   background-color: var(--primary-light);
   color: var(--primary-dark);
-  border: 1px solid #c5cbfa;
+  border: 1px solid #bcd4c3;
   white-space: nowrap;
 }
 
@@ -475,15 +465,6 @@
   display: flex;
   align-items: center;
   gap: 0.4rem;
-}
-
-.detail-urgent-tag {
-  font-size: 0.72rem;
-  font-weight: 800;
-  color: #dc2626;
-  background-color: #fee2e2;
-  padding: 0.15rem 0.5rem;
-  border-radius: var(--radius-full);
 }
 
 .detail-item-dday {
@@ -1082,7 +1063,7 @@
 .day-chip-btn.active {
   background-color: var(--primary-color);
   color: #ffffff;
-  box-shadow: 0 1px 3px rgba(10, 12, 140, 0.35);
+  box-shadow: 0 1px 3px rgba(85, 128, 97, 0.35);
 }
 
 .timetable-list {
@@ -1116,7 +1097,7 @@
   left: 0;
   bottom: 0;
   width: 0%;
-  background: linear-gradient(90deg, rgba(10, 12, 140, 0.12), rgba(10, 12, 140, 0.28));
+  background: linear-gradient(90deg, rgba(85, 128, 97, 0.15), rgba(85, 128, 97, 0.35));
   border-right: 2px solid var(--primary-color);
   pointer-events: none;
   z-index: 1;
@@ -1131,7 +1112,7 @@
 /* 현재 진행 중인 교시 스타일 */
 .period-row.is-current {
   border-color: var(--primary-color);
-  box-shadow: 0 0 0 2px rgba(10, 12, 140, 0.2), 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 0 0 2px rgba(85, 128, 97, 0.25), 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 }
 
 /* 이미 지난 교시 스타일 */
@@ -1462,7 +1443,7 @@
   background-color: var(--primary-color);
   border-color: var(--primary-color);
   color: #ffffff;
-  box-shadow: 0 2px 8px rgba(10, 12, 140, 0.3);
+  box-shadow: 0 2px 8px rgba(85, 128, 97, 0.3);
 }
 
 .archive-tab-panel {

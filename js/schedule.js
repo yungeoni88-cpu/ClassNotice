@@ -10,22 +10,22 @@
 // 📅 [2학년 4반 학사일정 목록] - 사용자가 요청한 일정 데이터 ('수행평가' -> '수행')
 // ==============================================================================
 const calendarEvents = [
-  { date: "2026-10-12", title: "영어II 수행 1&2차시", important: true },
-  { date: "2026-10-13", title: "영어II 수행 3차시", important: false },
-  { date: "2026-10-14", title: "영어II 수행 4차시", important: false },
-  { date: "2026-10-15", title: "세포와 물질대사 수행", important: true },
-  { date: "2026-10-20", title: "10월 모의고사", important: true },
-  { date: "2026-10-22", title: "미적분II 수행", important: true },
-  { date: "2026-10-23", title: "일본어 수행", important: false },
-  { date: "2026-10-28", title: "현장체험학습", important: true }
+  { date: "2026-10-12", title: "영어II 수행 1&2차시" },
+  { date: "2026-10-13", title: "영어II 수행 3차시" },
+  { date: "2026-10-14", title: "영어II 수행 4차시" },
+  { date: "2026-10-15", title: "세포와 물질대사 수행" },
+  { date: "2026-10-20", title: "10월 모의고사" },
+  { date: "2026-10-22", title: "미적분II 수행" },
+  { date: "2026-10-23", title: "일본어 수행" },
+  { date: "2026-10-28", title: "현장체험학습" }
 ];
 
 // 상단 D-Day 주요 요약 카드 목록
 const ddayList = [
-  { title: "영어II 수행 (1&2차시)", targetDate: "2026-10-12", urgent: true },
-  { title: "세포와 물질대사 수행", targetDate: "2026-10-15", urgent: false },
-  { title: "10월 모의고사", targetDate: "2026-10-20", urgent: true },
-  { title: "현장체험학습", targetDate: "2026-10-28", urgent: false }
+  { title: "영어II 수행 (1&2차시)", targetDate: "2026-10-12" },
+  { title: "세포와 물질대사 수행", targetDate: "2026-10-15" },
+  { title: "10월 모의고사", targetDate: "2026-10-20" },
+  { title: "현장체험학습", targetDate: "2026-10-28" }
 ];
 
 // 고정된 현재 해당 월 기준 (2026년 10월)
@@ -150,7 +150,7 @@ function renderDdayCards() {
     const ddayText = calculateDday(item.date);
     const cat = getEventCategory(item.title);
     return `
-      <div class="dday-card ${item.important ? 'urgent' : ''} ${cat.itemClass}">
+      <div class="dday-card ${cat.itemClass}">
         <div class="dday-info">
           <div class="dday-cat-row">
             <span class="sched-cat-tag ${cat.badgeClass}">
@@ -337,7 +337,6 @@ function renderSelectedDateDetails(dateStr) {
             <span class="sched-cat-tag ${cat.badgeClass}">
               <i class="${cat.icon}"></i> ${cat.name}
             </span>
-            ${item.important ? '<span class="detail-urgent-tag"><i class="fa-solid fa-triangle-exclamation"></i> 중요</span>' : ''}
           </div>
           <span class="detail-item-dday">${ddayText}</span>
         </div>
