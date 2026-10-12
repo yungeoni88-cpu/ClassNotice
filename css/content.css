@@ -181,6 +181,17 @@
   border-radius: var(--radius-md);
 }
 
+.dday-number.is-expired {
+  color: var(--text-muted);
+  background-color: var(--bg-subtle);
+  font-size: 1.2rem;
+}
+
+.dday-card.is-expired {
+  opacity: 0.8;
+  border-left-color: #94a3b8 !important;
+}
+
 .schedule-layout-grid {
   display: grid;
   grid-template-columns: 1.1fr 1fr;
@@ -411,6 +422,12 @@
   border-color: #fecaca;
 }
 
+.detail-dday-badge.is-expired {
+  background-color: var(--bg-subtle);
+  color: var(--text-muted);
+  border-color: var(--border-color);
+}
+
 .detail-caption {
   font-size: 0.85rem;
   color: var(--text-muted);
@@ -475,6 +492,12 @@
   padding: 0.2rem 0.5rem;
   border-radius: var(--radius-sm);
   border: 1px solid var(--border-color);
+}
+
+.detail-item-dday.is-expired {
+  background: var(--bg-subtle);
+  color: var(--text-light);
+  border-color: var(--border-color);
 }
 
 .detail-card-title {
