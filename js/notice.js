@@ -68,17 +68,6 @@ const periodSchedule = [
   { id: "p7", periodNum: 7, label: "7교시", start: "15:20", end: "16:10" },
 ];
 
-// 과목별 분류 태그 매핑 (시각적 구분)
-function getSubjectTag(subject) {
-  if (["역학과 에너지", "물질과 에너지", "세포와 물질대사"].includes(subject)) return "과학";
-  if (["미적분II", "확률과 통계"].includes(subject)) return "수학";
-  if (["화법과 언어"].includes(subject)) return "국어";
-  if (["영어II", "영어 발표와 토론"].includes(subject)) return "영어";
-  if (["일본어"].includes(subject)) return "외국어";
-  if (["스포츠 문화"].includes(subject)) return "체육";
-  if (["진로", "동아리", "자율"].includes(subject)) return "창체";
-  return "교과";
-}
 
 let currentSelectedDay = "월"; // 기본 선택 요일
 let timetableTimer = null; // 실시간 프로그레스 타이머
@@ -234,8 +223,6 @@ function renderTimetable(dayKey) {
 
     if (!subject) return;
 
-    const tag = getSubjectTag(subject);
-
     html += `
       <div class="period-row" data-period-id="p${item.periodNum}" data-start="${item.start}" data-end="${item.end}">
         <div class="period-progress-fill" style="width: 0%;"></div>
@@ -248,7 +235,6 @@ function renderTimetable(dayKey) {
         </div>
         <div class="period-right-group">
           <span class="live-status-container"></span>
-          <span class="subject-tag">${tag}</span>
         </div>
       </div>
     `;
@@ -369,11 +355,10 @@ function renderWeeklyTableView(container) {
         <td><strong>${item.label}</strong><br><span style="font-size:0.75rem; color:var(--text-light);">${item.start}~${item.end}</span></td>
         ${days.map(d => {
           const subj = (weeklyTimetable[d] && weeklyTimetable[d][pIdx]) ? weeklyTimetable[d][pIdx] : "-";
-          const tag = subj !== "-" ? getSubjectTag(subj) : "";
           const isTodayCol = d === todayName;
           return `
             <td class="${isTodayCol ? 'today-col-cell' : ''}">
-              ${subj !== "-" ? `<span class="weekly-subj">${subj}</span><span class="weekly-tag">${tag}</span>` : `<span style="color:#cbd5e1;">-</span>`}
+              ${subj !== "-" ? `<span class="weekly-subj">${subj}</span>` : `<span style="color:#cbd5e1;">-</span>`}
             </td>
           `;
         }).join("")}
