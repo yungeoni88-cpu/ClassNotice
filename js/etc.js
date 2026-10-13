@@ -7,6 +7,31 @@
 // 등록된 과목별 학습 자료 그룹 (과목명별 상자 / 윈도우 폴더 구조)
 const archiveSubjectGroups = [
   {
+    groupId: "grp-math",
+    subjectName: "수학",
+    description: "미적분II 및 확률과 통계 교과서 전문 전자책(PDF)",
+    files: [
+      {
+        id: "mat-math-1",
+        title: "미적분II 교과서",
+        fileName: "미적분II 교과서.pdf",
+        filePath: "files/미적분II 교과서.pdf",
+        fileSize: "38.6 MB",
+        fileExt: "PDF",
+        uploadDate: "2026.10.12"
+      },
+      {
+        id: "mat-math-2",
+        title: "확률과 통계 교과서",
+        fileName: "확통 교과서.pdf",
+        filePath: "files/확통 교과서.pdf",
+        fileSize: "42.2 MB",
+        fileExt: "PDF",
+        uploadDate: "2026.10.12"
+      }
+    ]
+  },
+  {
     groupId: "grp-eng",
     subjectName: "영어 & 영어 발표와 토론",
     description: "모의고사 기출 및 시험 대비 핵심 학습 자료",
@@ -73,38 +98,6 @@ const archiveSubjectGroups = [
         uploadDate: "2026.10.12"
       }
     ]
-  },
-  {
-    groupId: "grp-calc",
-    subjectName: "미적분II",
-    description: "2학년 4반 정규 수업 및 지필/수행평가 대비 교과서 전문 전자책(PDF)",
-    files: [
-      {
-        id: "mat-math-1",
-        title: "미적분II 교과서",
-        fileName: "미적분II 교과서.pdf",
-        filePath: "files/미적분II 교과서.pdf",
-        fileSize: "38.6 MB",
-        fileExt: "PDF",
-        uploadDate: "2026.10.12"
-      }
-    ]
-  },
-  {
-    groupId: "grp-prob",
-    subjectName: "확률과 통계",
-    description: "2학년 4반 정규 수업 및 지필/수행평가 대비 교과서 전문 전자책(PDF)",
-    files: [
-      {
-        id: "mat-math-2",
-        title: "확률과 통계 교과서",
-        fileName: "확통 교과서.pdf",
-        filePath: "files/확통 교과서.pdf",
-        fileSize: "42.2 MB",
-        fileExt: "PDF",
-        uploadDate: "2026.10.12"
-      }
-    ]
   }
 ];
 
@@ -158,6 +151,8 @@ function setupArchiveSubtabs() {
 
 /**
  * 학습 자료 목록 렌더링 (과목명별 상자 / 윈도우 탐색기 폴더 구조)
+ * - 각 상자(폴더) 접었다 폈다(Collapsible) 토글 기능 지원
+ * - 상단 '모두 펼치기 / 모두 접기' 일괄 제어 기능 지원
  */
 function renderArchiveMaterials() {
   const container = document.getElementById("archiveRepoPanel");
@@ -178,12 +173,20 @@ function renderArchiveMaterials() {
     return;
   }
 
-  // 상단 툴바 (과목 분류 태그/필터 없이 전체 통계 안내)
+  // 상단 툴바 (전체 통계 및 일괄 접기/펼치기 제어)
   const toolbarHtml = `
     <div class="archive-toolbar">
       <div class="archive-count-info">
         <i class="fa-solid fa-folder-open folder-toolbar-icon"></i>
         <span>총 <strong>${archiveSubjectGroups.length}</strong>개 과목 상자 / <strong>${totalFiles}</strong>개 학습 자료가 등록되어 있습니다.</span>
+      </div>
+      <div class="archive-toolbar-actions">
+        <button type="button" class="btn-folder-control" id="btnExpandAllFolders" title="모든 과목 폴더 펼치기">
+          <i class="fa-solid fa-folder-open"></i> 모두 펼치기
+        </button>
+        <button type="button" class="btn-folder-control" id="btnCollapseAllFolders" title="모든 과목 폴더 접기">
+          <i class="fa-solid fa-folder"></i> 모두 접기
+        </button>
       </div>
     </div>
   `;
@@ -193,7 +196,7 @@ function renderArchiveMaterials() {
     <div class="archive-folders-grid">
       ${archiveSubjectGroups.map(group => `
         <div class="card-box archive-folder-box" id="${group.groupId}">
-          <div class="folder-box-header">
+          <div class="folder-box-header" data-group-id="${group.groupId}" title="클릭하여 ${escapeHtml(group.subjectName)} 폴더 접기/펼치기">
             <div class="folder-header-left">
               <div class="folder-icon-wrap">
                 <i class="fa-solid fa-folder-open folder-main-icon"></i>
@@ -207,6 +210,9 @@ function renderArchiveMaterials() {
               <span class="folder-count-badge">
                 <i class="fa-regular fa-file-lines"></i> ${group.files.length}개 파일
               </span>
+              <button type="button" class="folder-toggle-btn" aria-label="${escapeHtml(group.subjectName)} 폴더 접기/펼치기">
+                <i class="fa-solid fa-chevron-up"></i>
+              </button>
             </div>
           </div>
 
@@ -245,6 +251,55 @@ function renderArchiveMaterials() {
   `;
 
   container.innerHTML = toolbarHtml + foldersGridHtml;
+
+  // 1) 개별 폴더 헤더 클릭 시 접기/펼치기 토글
+  const folderHeaders = container.querySelectorAll(".folder-box-header");
+  folderHeaders.forEach(header => {
+    header.addEventListener("click", () => {
+      const box = header.closest(".archive-folder-box");
+      if (!box) return;
+
+      const isCollapsed = box.classList.toggle("is-collapsed");
+      const icon = box.querySelector(".folder-main-icon");
+      const chevron = box.querySelector(".folder-toggle-btn i");
+
+      if (isCollapsed) {
+        if (icon) icon.className = "fa-solid fa-folder folder-main-icon";
+        if (chevron) chevron.className = "fa-solid fa-chevron-down";
+      } else {
+        if (icon) icon.className = "fa-solid fa-folder-open folder-main-icon";
+        if (chevron) chevron.className = "fa-solid fa-chevron-up";
+      }
+    });
+  });
+
+  // 2) 모두 펼치기 버튼 이벤트
+  const expandAllBtn = container.querySelector("#btnExpandAllFolders");
+  if (expandAllBtn) {
+    expandAllBtn.addEventListener("click", () => {
+      container.querySelectorAll(".archive-folder-box").forEach(box => {
+        box.classList.remove("is-collapsed");
+        const icon = box.querySelector(".folder-main-icon");
+        const chevron = box.querySelector(".folder-toggle-btn i");
+        if (icon) icon.className = "fa-solid fa-folder-open folder-main-icon";
+        if (chevron) chevron.className = "fa-solid fa-chevron-up";
+      });
+    });
+  }
+
+  // 3) 모두 접기 버튼 이벤트
+  const collapseAllBtn = container.querySelector("#btnCollapseAllFolders");
+  if (collapseAllBtn) {
+    collapseAllBtn.addEventListener("click", () => {
+      container.querySelectorAll(".archive-folder-box").forEach(box => {
+        box.classList.add("is-collapsed");
+        const icon = box.querySelector(".folder-main-icon");
+        const chevron = box.querySelector(".folder-toggle-btn i");
+        if (icon) icon.className = "fa-solid fa-folder folder-main-icon";
+        if (chevron) chevron.className = "fa-solid fa-chevron-down";
+      });
+    });
+  }
 }
 
 // 관리자 UI 동기화 헬퍼 (두 박스 모두 리렌더링)

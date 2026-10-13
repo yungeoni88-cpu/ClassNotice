@@ -1562,6 +1562,33 @@
   font-weight: 800;
 }
 
+.archive-toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.btn-folder-control {
+  background-color: var(--bg-subtle);
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0.32rem 0.7rem;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.btn-folder-control:hover {
+  background-color: #e2e8f0;
+  color: var(--text-main);
+  border-color: #cbd5e1;
+}
+
 /* 과목별 폴더 상자 그리드 (윈도우 탐색기 폴더 구조) */
 .archive-folders-grid {
   display: grid;
@@ -1592,7 +1619,7 @@
   border-color: #cbd5e1;
 }
 
-/* 폴더 상단 헤더 */
+/* 폴더 상단 헤더 (클릭 시 접기/펼치기) */
 .folder-box-header {
   display: flex;
   justify-content: space-between;
@@ -1601,6 +1628,13 @@
   background-color: var(--bg-subtle);
   border-bottom: 1.5px solid var(--border-color);
   gap: 0.75rem;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color var(--transition-fast);
+}
+
+.folder-box-header:hover {
+  background-color: #f1f5f9;
 }
 
 .folder-header-left {
@@ -1652,6 +1686,9 @@
 }
 
 .folder-header-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   flex-shrink: 0;
 }
 
@@ -1667,6 +1704,33 @@
   align-items: center;
   gap: 0.35rem;
   white-space: nowrap;
+}
+
+.folder-toggle-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.92rem;
+  cursor: pointer;
+  padding: 0.3rem;
+  border-radius: 50%;
+  transition: color var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.folder-box-header:hover .folder-toggle-btn {
+  color: var(--primary-color);
+}
+
+/* 접힌 상태 (Collapsed) */
+.archive-folder-box.is-collapsed .folder-box-header {
+  border-bottom: none;
+}
+
+.archive-folder-box.is-collapsed .folder-files-container {
+  display: none;
 }
 
 /* 폴더 내부 파일 목록 컨테이너 */
