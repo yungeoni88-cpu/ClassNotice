@@ -46,6 +46,17 @@ let selectedArchiveFilter = "all"; // 'all', '수학', '과학'
 // 로컬 스토리지 키 상수
 const STORAGE_KEY_JP = "daeryun_jp_requests";
 const STORAGE_KEY_ANON = "daeryun_anon_requests";
+const STORAGE_KEY_ADMIN_AUTH = "daeryun_archive_admin_auth";
+
+// [관리자 비밀번호 설정]
+// 관리자(사용자) 본인만 익명 요청 글을 삭제할 수 있도록 보호합니다.
+// 원하시는 비밀번호로 자유롭게 변경하실 수 있습니다. (기본값: "2404")
+const ARCHIVE_ADMIN_PW = "2404";
+
+// 관리자 인증 여부 확인
+function isArchiveAdmin() {
+  return localStorage.getItem(STORAGE_KEY_ADMIN_AUTH) === "true";
+}
 
 function initEtcModule() {
   setupArchiveSubtabs();
@@ -354,6 +365,9 @@ function setupAnonymousRequestForm() {
   const contentInput = document.getElementById("anonContent");
   const feedContainer = document.getElementById("anonFeedContainer");
   const countBadge = document.getElementById("anonCountBadge");
+  const adminAuthBtn = document.getElementById("anonAdminAuthBtn");
+  const adminAuthIcon = document.getElementById("adminAuthIcon");
+  const adminAuthBtnText = document.getElementById("adminAuthBtnText");
 
   if (!form || !subjSelect || !contentInput || !feedContainer) return;
 
@@ -387,9 +401,30 @@ function setupAnonymousRequestForm() {
     }
   }
 
+  // 관리자 인증 버튼 UI 동기화
+  function updateAdminAuthUI() {
+    if (!adminAuthBtn) return;
+    const isAdmin = isArchiveAdmin();
+
+    if (isAdmin) {
+      adminAuthBtn.classList.add("active");
+      adminAuthBtn.title = "관리자 권한 활성화됨 (클릭 시 로그아웃)";
+      if (adminAuthIcon) adminAuthIcon.className = "fa-solid fa-unlock-keyhole";
+      if (adminAuthBtnText) adminAuthBtnText.textContent = "관리자 ON";
+    } else {
+      adminAuthBtn.classList.remove("active");
+      adminAuthBtn.title = "관리자 인증 (글 삭제 권한 활성화)";
+      if (adminAuthIcon) adminAuthIcon.className = "fa-solid fa-lock";
+      if (adminAuthBtnText) adminAuthBtnText.textContent = "관리자";
+    }
+  }
+
   function renderAnonFeed() {
     const list = loadAnonRequests();
+    const isAdmin = isArchiveAdmin();
+
     if (countBadge) countBadge.textContent = list.length;
+    updateAdminAuthUI();
 
     if (list.length === 0) {
       feedContainer.innerHTML = `
@@ -412,9 +447,11 @@ function setupAnonymousRequestForm() {
               </div>
               <div class="anon-meta-right">
                 <span class="anon-time">${item.createdAt}</span>
-                <button type="button" class="btn-anon-delete" data-id="${item.id}" title="요청 글 삭제">
-                  <i class="fa-regular fa-trash-can"></i>
-                </button>
+                ${isAdmin ? `
+                  <button type="button" class="btn-anon-delete" data-id="${item.id}" title="요청 글 삭제 (관리자 전용)">
+                    <i class="fa-regular fa-trash-can"></i>
+                  </button>
+                ` : ""}
               </div>
             </div>
             <div class="anon-item-body">
@@ -454,18 +491,49 @@ function setupAnonymousRequestForm() {
       });
     });
 
-    // 삭제 버튼 이벤트
-    const deleteBtns = feedContainer.querySelectorAll(".btn-anon-delete");
-    deleteBtns.forEach(btn => {
-      btn.addEventListener("click", () => {
-        const id = btn.getAttribute("data-id");
-        if (confirm("이 익명 요청 글을 삭제하시겠습니까?")) {
-          const currentList = loadAnonRequests();
-          const updated = currentList.filter(it => it.id !== id);
-          saveAnonRequests(updated);
+    // 관리자 전용 삭제 버튼 이벤트 (관리자 인증 상태일 때만 동작)
+    if (isAdmin) {
+      const deleteBtns = feedContainer.querySelectorAll(".btn-anon-delete");
+      deleteBtns.forEach(btn => {
+        btn.addEventListener("click", () => {
+          if (!isArchiveAdmin()) {
+            alert("글 삭제 권한이 없습니다. 관리자 인증이 필요합니다.");
+            return;
+          }
+
+          const id = btn.getAttribute("data-id");
+          if (confirm("이 익명 요청 글을 삭제하시겠습니까? (관리자 권한)")) {
+            const currentList = loadAnonRequests();
+            const updated = currentList.filter(it => it.id !== id);
+            saveAnonRequests(updated);
+            renderAnonFeed();
+          }
+        });
+      });
+    }
+  }
+
+  // 관리자 인증 토글 버튼 이벤트
+  if (adminAuthBtn) {
+    adminAuthBtn.addEventListener("click", () => {
+      if (isArchiveAdmin()) {
+        if (confirm("관리자 모드를 해제(로그아웃)하시겠습니까?\n해제 시 글 삭제 권한이 비활성화됩니다.")) {
+          localStorage.removeItem(STORAGE_KEY_ADMIN_AUTH);
+          alert("관리자 모드가 해제되었습니다.");
           renderAnonFeed();
         }
-      });
+      } else {
+        const inputPw = prompt("익명 글 관리를 위한 관리자 비밀번호를 입력해주세요:");
+        if (inputPw === null) return; // 취소
+
+        if (inputPw.trim() === ARCHIVE_ADMIN_PW) {
+          localStorage.setItem(STORAGE_KEY_ADMIN_AUTH, "true");
+          alert("관리자 인증이 완료되었습니다!\n이제 익명 요청 글을 삭제할 수 있습니다.");
+          renderAnonFeed();
+        } else {
+          alert("관리자 비밀번호가 올바르지 않습니다.");
+        }
+      }
     });
   }
 

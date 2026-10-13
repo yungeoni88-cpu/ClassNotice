@@ -1995,6 +1995,41 @@
   color: #ffffff;
 }
 
+.btn-admin-auth {
+  background-color: #ffffff;
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0.28rem 0.65rem;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: all var(--transition-fast);
+}
+
+.btn-admin-auth:hover {
+  border-color: #94a3b8;
+  color: var(--text-main);
+  background-color: #f1f5f9;
+}
+
+.btn-admin-auth.active {
+  background-color: #ecfdf5;
+  border-color: #a7f3d0;
+  color: #059669;
+  font-weight: 800;
+  box-shadow: 0 1px 3px rgba(5, 150, 105, 0.15);
+}
+
+.btn-admin-auth.active:hover {
+  background-color: #fee2e2;
+  border-color: #fca5a5;
+  color: #dc2626;
+}
+
 .request-empty-state {
   text-align: center;
   padding: 1.8rem 1rem;
