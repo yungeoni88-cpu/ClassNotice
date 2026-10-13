@@ -10,8 +10,8 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
   <!-- CSS 분리 구조: 공통 베이스 스타일 & 카테고리별 컨텐츠 스타일 -->
-  <link rel="stylesheet" href="css/common.css?v=5">
-  <link rel="stylesheet" href="css/content.css?v=5">
+  <link rel="stylesheet" href="css/common.css?v=6">
+  <link rel="stylesheet" href="css/content.css?v=6">
 </head>
 <body>
   <!-- 상단 풀와이드 헤더 & 글로벌 네비게이션 (와이드 배너 디자인) -->
@@ -328,17 +328,125 @@
         </div>
       </div>
 
-      <!-- 2) 자료신청 패널 (내용 비워둠) -->
+      <!-- 2) 자료신청 패널 (일본어 기말자료 신청 & 자유 익명 자료 요청) -->
       <div class="archive-tab-panel" id="archiveRequestPanel">
-        <div class="card-box archive-empty-card">
-          <div class="empty-state-visual">
-            <i class="fa-regular fa-clipboard"></i>
+        <div class="archive-requests-grid">
+
+          <!-- [박스 1] 일본어 기말자료 신청 -->
+          <div class="card-box request-card-box" id="jpRequestBox">
+            <div class="request-box-header">
+              <div class="request-header-icon jp-icon">
+                <i class="fa-solid fa-language"></i>
+              </div>
+              <div class="request-header-text">
+                <h3 class="request-box-title">일본어 기말자료 신청</h3>
+                <p class="request-box-desc">기말고사 대비 일본어 학습자료 수령 희망자는 번호(1~24)와 이름을 입력해주세요.</p>
+              </div>
+            </div>
+
+            <form class="request-form" id="jpRequestForm">
+              <div class="form-row-compact">
+                <div class="form-field-item">
+                  <label for="jpStudentNum" class="form-field-label">출석번호</label>
+                  <select id="jpStudentNum" class="form-control form-select" required>
+                    <option value="">번호 선택 (1~24)</option>
+                    <option value="1">1번</option>
+                    <option value="2">2번</option>
+                    <option value="3">3번</option>
+                    <option value="4">4번</option>
+                    <option value="5">5번</option>
+                    <option value="6">6번</option>
+                    <option value="7">7번</option>
+                    <option value="8">8번</option>
+                    <option value="9">9번</option>
+                    <option value="10">10번</option>
+                    <option value="11">11번</option>
+                    <option value="12">12번</option>
+                    <option value="13">13번</option>
+                    <option value="14">14번</option>
+                    <option value="15">15번</option>
+                    <option value="16">16번</option>
+                    <option value="17">17번</option>
+                    <option value="18">18번</option>
+                    <option value="19">19번</option>
+                    <option value="20">20번</option>
+                    <option value="21">21번</option>
+                    <option value="22">22번</option>
+                    <option value="23">23번</option>
+                    <option value="24">24번</option>
+                  </select>
+                </div>
+                <div class="form-field-item">
+                  <label for="jpStudentName" class="form-field-label">학생 이름</label>
+                  <input type="text" id="jpStudentName" class="form-control form-input" placeholder="이름 (예: 홍길동)" maxlength="10" required autocomplete="off">
+                </div>
+              </div>
+              <button type="submit" class="btn-primary btn-request-action" id="jpSubmitBtn">
+                <i class="fa-solid fa-paper-plane"></i> 일본어 자료 신청하기
+              </button>
+            </form>
+
+            <!-- 신청 현황 목록 -->
+            <div class="request-status-wrap">
+              <div class="request-status-bar">
+                <span class="request-status-label"><i class="fa-solid fa-clipboard-check"></i> 신청 현황 (<strong id="jpCountBadge">0</strong>명)</span>
+                <button type="button" class="btn-copy-chip" id="jpCopyListBtn" title="신청자 명단 클립보드 복사"><i class="fa-regular fa-copy"></i> 명단 복사</button>
+              </div>
+              <div class="request-items-container" id="jpRequestListContainer">
+                <!-- JS 동적 렌더링 -->
+              </div>
+            </div>
           </div>
-          <h3 class="empty-state-title">등록된 자료 신청 내역이 없습니다</h3>
-          <p class="empty-state-sub">필요한 보충 학습 자료나 문제 풀이 요청이 등록되면 이곳에 표시됩니다.</p>
-          <div class="archive-list-container" id="archiveRequestList">
-            <!-- 추후 자료 신청 내역을 추가할 영역 (현재 비워둠) -->
+
+          <!-- [박스 2] 자유 익명 자료 요청 -->
+          <div class="card-box request-card-box" id="anonRequestBox">
+            <div class="request-box-header">
+              <div class="request-header-icon anon-icon">
+                <i class="fa-solid fa-user-secret"></i>
+              </div>
+              <div class="request-header-text">
+                <h3 class="request-box-title">자유 익명 자료 요청</h3>
+                <p class="request-box-desc">이름 없이 100% 익명으로 필요한 교과자료, 기출문제, 보충유인물을 자유롭게 요청하세요.</p>
+              </div>
+            </div>
+
+            <form class="request-form" id="anonRequestForm">
+              <div class="form-field-item">
+                <div class="form-label-row">
+                  <label for="anonSubjectSelect" class="form-field-label">희망 과목</label>
+                  <span class="anon-secure-pill"><i class="fa-solid fa-shield-halved"></i> 100% 익명 보장</span>
+                </div>
+                <select id="anonSubjectSelect" class="form-control form-select">
+                  <option value="공통/기타">공통 / 기타</option>
+                  <option value="수학">수학 (미적분 / 확통)</option>
+                  <option value="과학">과학 (물질과 에너지 등)</option>
+                  <option value="국어">국어 (화법과 언어)</option>
+                  <option value="영어">영어 (영어II / 영발토)</option>
+                  <option value="일본어">일본어</option>
+                </select>
+              </div>
+
+              <div class="form-field-item">
+                <label for="anonContent" class="form-field-label">요청 내용</label>
+                <textarea id="anonContent" class="form-control form-textarea" rows="3" placeholder="어떤 학습 자료나 기출문제가 필요한지 자유롭게 적어주세요! (예: 세포와 물질대사 핵심 요약본 올려주세요, 미적분 작년 기출 풀이 부탁드립니다 등)" required></textarea>
+              </div>
+
+              <button type="submit" class="btn-primary btn-request-action" id="anonSubmitBtn">
+                <i class="fa-solid fa-pen-nib"></i> 익명으로 요청 등록하기
+              </button>
+            </form>
+
+            <!-- 익명 요청 피드 목록 -->
+            <div class="request-status-wrap">
+              <div class="request-status-bar">
+                <span class="request-status-label"><i class="fa-solid fa-comments"></i> 실시간 요청 피드 (<strong id="anonCountBadge">0</strong>건)</span>
+              </div>
+              <div class="request-feed-container" id="anonFeedContainer">
+                <!-- JS 동적 렌더링 -->
+              </div>
+            </div>
           </div>
+
         </div>
       </div>
     </section>
@@ -373,11 +481,11 @@
 
   <!-- 자바스크립트 분리 로드 -->
   <!-- 카테고리별 독립 로직 (데이터 & 기능) -->
-  <script src="js/notice.js?v=5"></script>
-  <script src="js/schedule.js?v=5"></script>
-  <script src="js/meal.js?v=5"></script>
-  <script src="js/etc.js?v=5"></script>
+  <script src="js/notice.js?v=6"></script>
+  <script src="js/schedule.js?v=6"></script>
+  <script src="js/meal.js?v=6"></script>
+  <script src="js/etc.js?v=6"></script>
   <!-- 메인 컨트롤러 (탭 전환 및 전체 초기화) -->
-  <script src="js/main.js?v=5"></script>
+  <script src="js/main.js?v=6"></script>
 </body>
 </html>
