@@ -2030,6 +2030,46 @@
   color: #dc2626;
 }
 
+.status-action-btns {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.request-locked-notice {
+  text-align: center;
+  padding: 2.2rem 1.25rem;
+  color: var(--text-muted);
+  background-color: #ffffff;
+  border: 1px dashed var(--border-color);
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.request-locked-notice i {
+  font-size: 2.2rem;
+  color: #94a3b8;
+  margin-bottom: 0.25rem;
+}
+
+.request-locked-notice .lock-title {
+  font-size: 0.96rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin: 0;
+}
+
+.request-locked-notice .lock-desc {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin: 0;
+  word-break: keep-all;
+}
+
 .request-empty-state {
   text-align: center;
   padding: 1.8rem 1rem;

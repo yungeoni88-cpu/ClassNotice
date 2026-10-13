@@ -186,12 +186,37 @@ function renderArchiveMaterials() {
   });
 }
 
+// 관리자 UI 동기화 헬퍼 (두 박스 모두 리렌더링)
+let refreshArchiveModules = () => {};
+
+function handleArchiveAdminToggle() {
+  if (isArchiveAdmin()) {
+    if (confirm("관리자 모드를 해제(로그아웃)하시겠습니까?\n해제 시 신청 현황 명단 및 글 삭제 권한이 비활성화됩니다.")) {
+      localStorage.removeItem(STORAGE_KEY_ADMIN_AUTH);
+      alert("관리자 모드가 해제되었습니다.");
+      refreshArchiveModules();
+    }
+  } else {
+    const inputPw = prompt("관리자 비밀번호를 입력해주세요:");
+    if (inputPw === null) return;
+
+    if (inputPw.trim() === ARCHIVE_ADMIN_PW) {
+      localStorage.setItem(STORAGE_KEY_ADMIN_AUTH, "true");
+      alert("관리자 인증이 완료되었습니다!\n이제 일본어 신청 명단 열람 및 익명 글 관리 권한이 활성화됩니다.");
+      refreshArchiveModules();
+    } else {
+      alert("관리자 비밀번호가 올바르지 않습니다.");
+    }
+  }
+}
+
 /**
  * ========================================================
  * [박스 1] 일본어 기말자료 신청 로직
  * - 출석번호(1~24번) 선택 + 학생 이름 수동 입력
  * - 번호 중복 방지 및 오름차순 자동 정렬
- * - 실시간 현황 칩 렌더링, 신청 취소, 명단 클립보드 복사
+ * - 관리자 전용: 신청 현황 칩 렌더링, 신청 취소, 명단 클립보드 복사
+ * - 일반 학생: 신청 현황 비공개 보호 안내 카드 표시
  * ========================================================
  */
 function setupJapaneseRequestForm() {
@@ -201,6 +226,9 @@ function setupJapaneseRequestForm() {
   const listContainer = document.getElementById("jpRequestListContainer");
   const countBadge = document.getElementById("jpCountBadge");
   const copyBtn = document.getElementById("jpCopyListBtn");
+  const adminAuthBtn = document.getElementById("jpAdminAuthBtn");
+  const adminAuthIcon = document.getElementById("jpAdminAuthIcon");
+  const adminAuthBtnText = document.getElementById("jpAdminAuthBtnText");
 
   if (!form || !numSelect || !nameInput || !listContainer) return;
 
@@ -222,15 +250,53 @@ function setupJapaneseRequestForm() {
     }
   }
 
+  function updateJpAdminUI() {
+    if (!adminAuthBtn) return;
+    const isAdmin = isArchiveAdmin();
+
+    if (isAdmin) {
+      adminAuthBtn.classList.add("active");
+      adminAuthBtn.title = "관리자 권한 활성화됨 (클릭 시 로그아웃)";
+      if (adminAuthIcon) adminAuthIcon.className = "fa-solid fa-unlock-keyhole";
+      if (adminAuthBtnText) adminAuthBtnText.textContent = "관리자 ON";
+    } else {
+      adminAuthBtn.classList.remove("active");
+      adminAuthBtn.title = "관리자 인증 (신청 명단 열람)";
+      if (adminAuthIcon) adminAuthIcon.className = "fa-solid fa-lock";
+      if (adminAuthBtnText) adminAuthBtnText.textContent = "관리자";
+    }
+  }
+
   function renderJpList() {
     const list = loadJpRequests();
-    if (countBadge) countBadge.textContent = list.length;
+    const isAdmin = isArchiveAdmin();
+
+    updateJpAdminUI();
+
+    // 관리자가 아닐 때 (일반 학생) : 신청 현황 비공개
+    if (!isAdmin) {
+      if (countBadge) countBadge.textContent = "비공개";
+      if (copyBtn) copyBtn.style.display = "none";
+
+      listContainer.innerHTML = `
+        <div class="request-locked-notice">
+          <i class="fa-solid fa-user-shield"></i>
+          <p class="lock-title">신청자 명단은 관리자 전용입니다</p>
+          <p class="lock-desc">개인정보 보호를 위해 신청자 명단은 관리자에게만 비공개 처리됩니다.<br>자료 수령 희망자는 위의 양식으로 신청해주세요.</p>
+        </div>
+      `;
+      return;
+    }
+
+    // 관리자 인증 상태일 때 : 인원 수 및 복사 버튼 표시, 명단 노출
+    if (countBadge) countBadge.textContent = `${list.length}명`;
+    if (copyBtn) copyBtn.style.display = "inline-flex";
 
     if (list.length === 0) {
       listContainer.innerHTML = `
         <div class="request-empty-state">
           <i class="fa-regular fa-clipboard"></i>
-          <p>아직 일본어 자료를 신청한 학생이 없습니다.<br>출석번호와 이름을 입력하여 첫 번째로 신청해보세요!</p>
+          <p>아직 일본어 자료를 신청한 학생이 없습니다.</p>
         </div>
       `;
       return;
@@ -253,10 +319,15 @@ function setupJapaneseRequestForm() {
       </div>
     `;
 
-    // 신청 취소 버튼 이벤트 바인딩
+    // 신청 취소 버튼 이벤트 바인딩 (관리자 전용)
     const cancelBtns = listContainer.querySelectorAll(".btn-cancel-chip");
     cancelBtns.forEach(btn => {
       btn.addEventListener("click", () => {
+        if (!isArchiveAdmin()) {
+          alert("관리자 권한이 필요합니다.");
+          return;
+        }
+
         const targetNum = Number(btn.getAttribute("data-num"));
         const targetItem = list.find(it => Number(it.num) === targetNum);
         const displayName = targetItem ? `${targetItem.num}번 ${targetItem.name}` : `${targetNum}번`;
@@ -268,6 +339,11 @@ function setupJapaneseRequestForm() {
         }
       });
     });
+  }
+
+  // 관리자 인증 버튼 이벤트
+  if (adminAuthBtn) {
+    adminAuthBtn.addEventListener("click", handleArchiveAdminToggle);
   }
 
   // 폼 제출 이벤트
@@ -291,7 +367,11 @@ function setupJapaneseRequestForm() {
     const currentList = loadJpRequests();
     const existing = currentList.find(it => Number(it.num) === num);
     if (existing) {
-      alert(`이미 ${num}번(${existing.name}) 학생이 신청을 완료했습니다.\n번호를 잘못 선택하셨거나 수정을 원하시면 기존 신청을 취소한 후 다시 시도해주세요.`);
+      if (isArchiveAdmin()) {
+        alert(`이미 ${num}번(${existing.name}) 학생이 신청을 완료했습니다.\n번호를 잘못 선택하셨거나 수정을 원하시면 기존 신청을 취소한 후 다시 시도해주세요.`);
+      } else {
+        alert(`이미 ${num}번 학생의 신청이 완료되었습니다.\n본인 번호가 맞지 않다면 번호를 다시 확인해주세요.`);
+      }
       return;
     }
 
@@ -311,9 +391,14 @@ function setupJapaneseRequestForm() {
     alert(`${num}번 ${name} 학생의 일본어 기말자료 신청이 완료되었습니다!`);
   });
 
-  // 명단 클립보드 복사 버튼
+  // 명단 클립보드 복사 버튼 (관리자 전용)
   if (copyBtn) {
     copyBtn.addEventListener("click", () => {
+      if (!isArchiveAdmin()) {
+        alert("관리자만 명단을 복사할 수 있습니다.");
+        return;
+      }
+
       const list = loadJpRequests();
       if (list.length === 0) {
         alert("복사할 신청자 명단이 아직 없습니다.");
@@ -346,8 +431,9 @@ function setupJapaneseRequestForm() {
     });
   }
 
-  // 초기 렌더링
+  // 초기 렌더링 및 모듈 등록
   renderJpList();
+  window._renderJpList = renderJpList;
 }
 
 /**
@@ -355,7 +441,8 @@ function setupJapaneseRequestForm() {
  * [박스 2] 자유 익명 자료 요청 로직
  * - 100% 익명 보장 피드 (이름 없이 자유 글 작성)
  * - 과목 선택 및 상세 요청 내용 입력
- * - 실시간 피드 렌더링, 공감(좋아요), 삭제 기능
+ * - 실시간 피드 렌더링, 공감(좋아요)
+ * - 관리자 전용: 익명 요청 글 삭제 기능
  * ========================================================
  */
 function setupAnonymousRequestForm() {
@@ -514,26 +601,7 @@ function setupAnonymousRequestForm() {
 
   // 관리자 인증 토글 버튼 이벤트
   if (adminAuthBtn) {
-    adminAuthBtn.addEventListener("click", () => {
-      if (isArchiveAdmin()) {
-        if (confirm("관리자 모드를 해제(로그아웃)하시겠습니까?\n해제 시 글 삭제 권한이 비활성화됩니다.")) {
-          localStorage.removeItem(STORAGE_KEY_ADMIN_AUTH);
-          alert("관리자 모드가 해제되었습니다.");
-          renderAnonFeed();
-        }
-      } else {
-        const inputPw = prompt("익명 글 관리를 위한 관리자 비밀번호를 입력해주세요:");
-        if (inputPw === null) return; // 취소
-
-        if (inputPw.trim() === ARCHIVE_ADMIN_PW) {
-          localStorage.setItem(STORAGE_KEY_ADMIN_AUTH, "true");
-          alert("관리자 인증이 완료되었습니다!\n이제 익명 요청 글을 삭제할 수 있습니다.");
-          renderAnonFeed();
-        } else {
-          alert("관리자 비밀번호가 올바르지 않습니다.");
-        }
-      }
-    });
+    adminAuthBtn.addEventListener("click", handleArchiveAdminToggle);
   }
 
   // 폼 제출 이벤트
@@ -574,8 +642,15 @@ function setupAnonymousRequestForm() {
     alert("익명 자료 요청이 성공적으로 등록되었습니다!");
   });
 
-  // 초기 렌더링
+  // 초기 렌더링 및 모듈 등록
   renderAnonFeed();
+  window._renderAnonFeed = renderAnonFeed;
+
+  // 전체 리프레시 콜백 연결
+  refreshArchiveModules = () => {
+    if (window._renderJpList) window._renderJpList();
+    if (window._renderAnonFeed) window._renderAnonFeed();
+  };
 }
 
 /**

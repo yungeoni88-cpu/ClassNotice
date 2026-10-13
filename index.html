@@ -10,8 +10,8 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
   <!-- CSS 분리 구조: 공통 베이스 스타일 & 카테고리별 컨텐츠 스타일 -->
-  <link rel="stylesheet" href="css/common.css?v=7">
-  <link rel="stylesheet" href="css/content.css?v=7">
+  <link rel="stylesheet" href="css/common.css?v=9">
+  <link rel="stylesheet" href="css/content.css?v=9">
 </head>
 <body>
   <!-- 상단 풀와이드 헤더 & 글로벌 네비게이션 (와이드 배너 디자인) -->
@@ -389,8 +389,13 @@
             <!-- 신청 현황 목록 -->
             <div class="request-status-wrap">
               <div class="request-status-bar">
-                <span class="request-status-label"><i class="fa-solid fa-clipboard-check"></i> 신청 현황 (<strong id="jpCountBadge">0</strong>명)</span>
-                <button type="button" class="btn-copy-chip" id="jpCopyListBtn" title="신청자 명단 클립보드 복사"><i class="fa-regular fa-copy"></i> 명단 복사</button>
+                <span class="request-status-label"><i class="fa-solid fa-clipboard-check"></i> 신청 현황 (<strong id="jpCountBadge">비공개</strong>)</span>
+                <div class="status-action-btns">
+                  <button type="button" class="btn-copy-chip" id="jpCopyListBtn" title="신청자 명단 클립보드 복사" style="display: none;"><i class="fa-regular fa-copy"></i> 명단 복사</button>
+                  <button type="button" class="btn-admin-auth" id="jpAdminAuthBtn" title="관리자 인증 (신청 명단 열람)">
+                    <i class="fa-solid fa-lock" id="jpAdminAuthIcon"></i> <span id="jpAdminAuthBtnText">관리자</span>
+                  </button>
+                </div>
               </div>
               <div class="request-items-container" id="jpRequestListContainer">
                 <!-- JS 동적 렌더링 -->
@@ -484,11 +489,11 @@
 
   <!-- 자바스크립트 분리 로드 -->
   <!-- 카테고리별 독립 로직 (데이터 & 기능) -->
-  <script src="js/notice.js?v=7"></script>
-  <script src="js/schedule.js?v=7"></script>
-  <script src="js/meal.js?v=7"></script>
-  <script src="js/etc.js?v=8"></script>
+  <script src="js/notice.js?v=9"></script>
+  <script src="js/schedule.js?v=9"></script>
+  <script src="js/meal.js?v=9"></script>
+  <script src="js/etc.js?v=9"></script>
   <!-- 메인 컨트롤러 (탭 전환 및 전체 초기화) -->
-  <script src="js/main.js?v=7"></script>
+  <script src="js/main.js?v=9"></script>
 </body>
 </html>
