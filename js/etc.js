@@ -4,44 +4,109 @@
  * - 교과 학습 자료 및 PDF 교과서 목록 렌더링 (미리보기 & 다운로드 연동)
  */
 
-// 등록된 학습 자료 목록 (PDF 교과서 및 수업 보조 자료)
-const archiveMaterials = [
+// 등록된 과목별 학습 자료 그룹 (과목명별 상자 / 윈도우 폴더 구조)
+const archiveSubjectGroups = [
   {
-    id: "mat-1",
-    title: "물질과 에너지 교과서",
-    subject: "과학",
-    fileName: "물질과 에너지 교과서.pdf",
-    filePath: "files/물질과 에너지 교과서.pdf",
-    fileSize: "17.3 MB",
-    fileExt: "PDF",
-    uploadDate: "2026.10.12",
-    description: "2학년 4반 정규 수업 및 수행 대비 교과서 전문 전자책(PDF)"
+    groupId: "grp-eng",
+    subjectName: "영어 & 영어 발표와 토론",
+    description: "모의고사 기출 및 시험 대비 핵심 학습 자료",
+    files: [
+      {
+        id: "mat-eng-2025-10",
+        title: "2025년 10월 모의고사 (고2)",
+        fileName: "2025년 10월 모의고사(고2).pdf",
+        filePath: "files/2025년 10월 모의고사(고2).pdf",
+        fileSize: "486 KB",
+        fileExt: "PDF",
+        uploadDate: "2026.10.13"
+      },
+      {
+        id: "mat-eng-2025-09",
+        title: "2025년 9월 모의고사 (고2)",
+        fileName: "2025년 9월 모의고사(고2).pdf",
+        filePath: "files/2025년 9월 모의고사(고2).pdf",
+        fileSize: "414 KB",
+        fileExt: "PDF",
+        uploadDate: "2026.10.13"
+      },
+      {
+        id: "mat-eng-2024-10",
+        title: "2024년 10월 모의고사 (고2)",
+        fileName: "2024년 10월 모의고사(고2).pdf",
+        filePath: "files/2024년 10월 모의고사(고2).pdf",
+        fileSize: "728 KB",
+        fileExt: "PDF",
+        uploadDate: "2026.10.13"
+      },
+      {
+        id: "mat-eng-2024-09",
+        title: "2024년 9월 모의고사 (고2)",
+        fileName: "2024년 9월 모의고사(고2).pdf",
+        filePath: "files/2024년 9월 모의고사(고2).pdf",
+        fileSize: "1.09 MB",
+        fileExt: "PDF",
+        uploadDate: "2026.10.13"
+      },
+      {
+        id: "mat-eng-2023-09",
+        title: "2023년 9월 모의고사 (고2)",
+        fileName: "2023년 9월 모의고사(고2).pdf",
+        filePath: "files/2023년 9월 모의고사(고2).pdf",
+        fileSize: "905 KB",
+        fileExt: "PDF",
+        uploadDate: "2026.10.13"
+      }
+    ]
   },
   {
-    id: "mat-2",
-    title: "미적분II 교과서",
-    subject: "수학",
-    fileName: "미적분II 교과서.pdf",
-    filePath: "files/미적분II 교과서.pdf",
-    fileSize: "38.6 MB",
-    fileExt: "PDF",
-    uploadDate: "2026.10.12",
-    description: "2학년 4반 정규 수업 및 지필/수행평가 대비 교과서 전문 전자책(PDF)"
+    groupId: "grp-matter",
+    subjectName: "물질과 에너지",
+    description: "2학년 4반 정규 수업 및 수행 대비 교과서 전문 전자책(PDF)",
+    files: [
+      {
+        id: "mat-sci-1",
+        title: "물질과 에너지 교과서",
+        fileName: "물질과 에너지 교과서.pdf",
+        filePath: "files/물질과 에너지 교과서.pdf",
+        fileSize: "17.3 MB",
+        fileExt: "PDF",
+        uploadDate: "2026.10.12"
+      }
+    ]
   },
   {
-    id: "mat-3",
-    title: "확률과 통계 교과서",
-    subject: "수학",
-    fileName: "확통 교과서.pdf",
-    filePath: "files/확통 교과서.pdf",
-    fileSize: "42.2 MB",
-    fileExt: "PDF",
-    uploadDate: "2026.10.12",
-    description: "2학년 4반 정규 수업 및 지필/수행평가 대비 교과서 전문 전자책(PDF)"
+    groupId: "grp-calc",
+    subjectName: "미적분II",
+    description: "2학년 4반 정규 수업 및 지필/수행평가 대비 교과서 전문 전자책(PDF)",
+    files: [
+      {
+        id: "mat-math-1",
+        title: "미적분II 교과서",
+        fileName: "미적분II 교과서.pdf",
+        filePath: "files/미적분II 교과서.pdf",
+        fileSize: "38.6 MB",
+        fileExt: "PDF",
+        uploadDate: "2026.10.12"
+      }
+    ]
+  },
+  {
+    groupId: "grp-prob",
+    subjectName: "확률과 통계",
+    description: "2학년 4반 정규 수업 및 지필/수행평가 대비 교과서 전문 전자책(PDF)",
+    files: [
+      {
+        id: "mat-math-2",
+        title: "확률과 통계 교과서",
+        fileName: "확통 교과서.pdf",
+        filePath: "files/확통 교과서.pdf",
+        fileSize: "42.2 MB",
+        fileExt: "PDF",
+        uploadDate: "2026.10.12"
+      }
+    ]
   }
 ];
-
-let selectedArchiveFilter = "all"; // 'all', '수학', '과학'
 
 // 로컬 스토리지 키 상수
 const STORAGE_KEY_JP = "daeryun_jp_requests";
@@ -92,13 +157,15 @@ function setupArchiveSubtabs() {
 }
 
 /**
- * 학습 자료 목록 렌더링
+ * 학습 자료 목록 렌더링 (과목명별 상자 / 윈도우 탐색기 폴더 구조)
  */
 function renderArchiveMaterials() {
   const container = document.getElementById("archiveRepoPanel");
   if (!container) return;
 
-  if (archiveMaterials.length === 0) {
+  const totalFiles = archiveSubjectGroups.reduce((acc, g) => acc + g.files.length, 0);
+
+  if (totalFiles === 0) {
     container.innerHTML = `
       <div class="card-box archive-empty-card">
         <div class="empty-state-visual">
@@ -111,79 +178,73 @@ function renderArchiveMaterials() {
     return;
   }
 
-  // 필터링
-  const filteredList = selectedArchiveFilter === "all"
-    ? archiveMaterials
-    : archiveMaterials.filter(m => m.subject === selectedArchiveFilter);
-
-  // 상단 툴바
-  const filterHtml = `
+  // 상단 툴바 (과목 분류 태그/필터 없이 전체 통계 안내)
+  const toolbarHtml = `
     <div class="archive-toolbar">
       <div class="archive-count-info">
-        <i class="fa-solid fa-file-pdf"></i>
-        <span>총 <strong>${archiveMaterials.length}</strong>개의 학습 자료가 등록되어 있습니다.</span>
-      </div>
-      <div class="archive-subject-filters">
-        <button class="archive-filter-chip ${selectedArchiveFilter === 'all' ? 'active' : ''}" data-filter="all">전체 (${archiveMaterials.length})</button>
-        <button class="archive-filter-chip ${selectedArchiveFilter === '수학' ? 'active' : ''}" data-filter="수학">수학 (${archiveMaterials.filter(m => m.subject === '수학').length})</button>
-        <button class="archive-filter-chip ${selectedArchiveFilter === '과학' ? 'active' : ''}" data-filter="과학">과학 (${archiveMaterials.filter(m => m.subject === '과학').length})</button>
+        <i class="fa-solid fa-folder-open folder-toolbar-icon"></i>
+        <span>총 <strong>${archiveSubjectGroups.length}</strong>개 과목 상자 / <strong>${totalFiles}</strong>개 학습 자료가 등록되어 있습니다.</span>
       </div>
     </div>
   `;
 
-  // 카드 그리드
-  const cardsHtml = `
-    <div class="archive-materials-grid">
-      ${filteredList.map(item => {
-        const encodedUrl = encodeURI(item.filePath);
-        return `
-          <div class="card-box material-card">
-            <div class="material-card-top">
-              <div class="material-badges">
-                <span class="material-subj-tag subj-${item.subject === '수학' ? 'math' : 'sci'}">${item.subject}</span>
-                <span class="material-ext-tag"><i class="fa-solid fa-file-pdf"></i> ${item.fileExt}</span>
+  // 과목별 상자(폴더 박스) 그리드
+  const foldersGridHtml = `
+    <div class="archive-folders-grid">
+      ${archiveSubjectGroups.map(group => `
+        <div class="card-box archive-folder-box" id="${group.groupId}">
+          <div class="folder-box-header">
+            <div class="folder-header-left">
+              <div class="folder-icon-wrap">
+                <i class="fa-solid fa-folder-open folder-main-icon"></i>
               </div>
-              <span class="material-size-badge">${item.fileSize}</span>
-            </div>
-            
-            <div class="material-card-body">
-              <div class="material-icon-box">
-                <i class="fa-solid fa-book-bookmark"></i>
-              </div>
-              <div class="material-text-wrap">
-                <h4 class="material-title" title="${item.title}">${item.title}</h4>
-                <p class="material-desc">${item.description}</p>
-                <div class="material-meta-row">
-                  <span><i class="fa-regular fa-calendar"></i> ${item.uploadDate}</span>
-                  <span><i class="fa-regular fa-file"></i> ${item.fileName}</span>
-                </div>
+              <div class="folder-title-wrap">
+                <h3 class="folder-subject-title">${escapeHtml(group.subjectName)}</h3>
+                <p class="folder-desc">${escapeHtml(group.description)}</p>
               </div>
             </div>
-
-            <div class="material-card-footer">
-              <a href="${encodedUrl}" target="_blank" rel="noopener noreferrer" class="btn-material-preview" title="새 탭에서 PDF 열람">
-                <i class="fa-solid fa-arrow-up-right-from-square"></i> 바로보기
-              </a>
-              <a href="${encodedUrl}" download="${item.fileName}" class="btn-material-download" title="기기에 파일 다운로드">
-                <i class="fa-solid fa-download"></i> 다운로드
-              </a>
+            <div class="folder-header-right">
+              <span class="folder-count-badge">
+                <i class="fa-regular fa-file-lines"></i> ${group.files.length}개 파일
+              </span>
             </div>
           </div>
-        `;
-      }).join("")}
+
+          <div class="folder-files-container">
+            ${group.files.map(file => {
+              const encodedUrl = encodeURI(file.filePath);
+              return `
+                <div class="folder-file-row">
+                  <div class="file-row-left">
+                    <div class="file-type-icon">
+                      <i class="fa-solid fa-file-pdf"></i>
+                    </div>
+                    <div class="file-details">
+                      <h4 class="file-title" title="${escapeHtml(file.fileName)}">${escapeHtml(file.title)}</h4>
+                      <div class="file-meta">
+                        <span class="file-size-tag"><i class="fa-regular fa-hard-drive"></i> ${file.fileSize}</span>
+                        <span class="file-date-tag"><i class="fa-regular fa-calendar"></i> ${file.uploadDate}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="file-row-actions">
+                    <a href="${encodedUrl}" target="_blank" rel="noopener noreferrer" class="btn-file-preview" title="새 탭에서 PDF 열람">
+                      <i class="fa-solid fa-arrow-up-right-from-square"></i> <span>바로보기</span>
+                    </a>
+                    <a href="${encodedUrl}" download="${escapeHtml(file.fileName)}" class="btn-file-download" title="기기에 파일 다운로드">
+                      <i class="fa-solid fa-download"></i> <span>다운로드</span>
+                    </a>
+                  </div>
+                </div>
+              `;
+            }).join("")}
+          </div>
+        </div>
+      `).join("")}
     </div>
   `;
 
-  container.innerHTML = filterHtml + cardsHtml;
-
-  // 필터 버튼 이벤트 바인딩
-  const filterBtns = container.querySelectorAll(".archive-filter-chip");
-  filterBtns.forEach(btn => {
-    btn.addEventListener("click", () => {
-      selectedArchiveFilter = btn.getAttribute("data-filter");
-      renderArchiveMaterials();
-    });
-  });
+  container.innerHTML = toolbarHtml + foldersGridHtml;
 }
 
 // 관리자 UI 동기화 헬퍼 (두 박스 모두 리렌더링)
