@@ -50,8 +50,7 @@ const STORAGE_KEY_ADMIN_AUTH = "daeryun_archive_admin_auth";
 
 // [관리자 비밀번호 설정]
 // 관리자(사용자) 본인만 익명 요청 글을 삭제할 수 있도록 보호합니다.
-// 원하시는 비밀번호로 자유롭게 변경하실 수 있습니다. (기본값: "2404")
-const ARCHIVE_ADMIN_PW = "2404";
+const ARCHIVE_ADMIN_PW = "38040281";
 
 // 관리자 인증 여부 확인
 function isArchiveAdmin() {
