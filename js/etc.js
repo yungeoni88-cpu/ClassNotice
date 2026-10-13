@@ -195,11 +195,11 @@ function renderArchiveMaterials() {
   const foldersGridHtml = `
     <div class="archive-folders-grid">
       ${archiveSubjectGroups.map(group => `
-        <div class="card-box archive-folder-box" id="${group.groupId}">
+        <div class="card-box archive-folder-box is-collapsed" id="${group.groupId}">
           <div class="folder-box-header" data-group-id="${group.groupId}" title="클릭하여 ${escapeHtml(group.subjectName)} 폴더 접기/펼치기">
             <div class="folder-header-left">
               <div class="folder-icon-wrap">
-                <i class="fa-solid fa-folder-open folder-main-icon"></i>
+                <i class="fa-solid fa-folder folder-main-icon"></i>
               </div>
               <div class="folder-title-wrap">
                 <h3 class="folder-subject-title">${escapeHtml(group.subjectName)}</h3>
@@ -211,7 +211,7 @@ function renderArchiveMaterials() {
                 <i class="fa-regular fa-file-lines"></i> ${group.files.length}개 파일
               </span>
               <button type="button" class="folder-toggle-btn" aria-label="${escapeHtml(group.subjectName)} 폴더 접기/펼치기">
-                <i class="fa-solid fa-chevron-up"></i>
+                <i class="fa-solid fa-chevron-down"></i>
               </button>
             </div>
           </div>

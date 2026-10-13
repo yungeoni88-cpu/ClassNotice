@@ -1536,7 +1536,8 @@
   align-items: center;
   flex-wrap: wrap;
   gap: 0.85rem;
-  margin-bottom: 1.25rem;
+  max-width: 860px;
+  margin: 0 auto 1.15rem;
   padding: 0.85rem 1.15rem;
   background-color: var(--bg-card);
   border: 1px solid var(--border-color);
@@ -1589,19 +1590,13 @@
   border-color: #cbd5e1;
 }
 
-/* 과목별 폴더 상자 그리드 (윈도우 탐색기 폴더 구조) */
+/* 과목별 폴더 상자 목록 (윈도우 탐색기 폴더 구조 - 세로 스택형) */
 .archive-folders-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1.35rem;
-  align-items: start;
-}
-
-@media (max-width: 900px) {
-  .archive-folders-grid {
-    grid-template-columns: 1fr;
-    gap: 1.15rem;
-  }
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  max-width: 860px;
+  margin: 0 auto;
 }
 
 .archive-folder-box {
