@@ -13,9 +13,11 @@ const calendarEvents = [
   { date: "2026-10-12", title: "영어II 수행 1&2차시" },
   { date: "2026-10-13", title: "영어II 수행 3차시" },
   { date: "2026-10-14", title: "영어II 수행 4차시" },
-  { date: "2026-10-15", title: "세포와 물질대사 수행" },
+  { date: "2026-10-15", title: "세포와 물질대사 수행 1차시" },
+  { date: "2026-10-16", title: "세포와 물질대사 수행 2차시" },
   { date: "2026-10-19", title: "영어 발표와 토론 수행 1,2차시" },
   { date: "2026-10-20", title: "10월 모의고사" },
+  { date: "2026-10-21", title: "영어II 수행 (미발표자)" },
   { date: "2026-10-22", title: "미적분II 수행" },
   { date: "2026-10-22", title: "확률과 통계 수행" },
   { date: "2026-10-23", title: "일본어 수행" },
@@ -35,7 +37,7 @@ const pendingNovemberEvents = [
 // 상단 D-Day 주요 요약 카드 목록
 const ddayList = [
   { title: "영어II 수행 (1&2차시)", targetDate: "2026-10-12" },
-  { title: "세포와 물질대사 수행", targetDate: "2026-10-15" },
+  { title: "세포와 물질대사 수행 1차시", targetDate: "2026-10-15" },
   { title: "10월 모의고사", targetDate: "2026-10-20" },
   { title: "현장체험학습", targetDate: "2026-10-28" }
 ];
