@@ -110,6 +110,32 @@ const STORAGE_KEY_ADMIN_AUTH = "daeryun_archive_admin_auth";
 // 관리자(사용자) 본인만 익명 요청 글을 삭제할 수 있도록 보호합니다.
 const ARCHIVE_ADMIN_PW = "38040281";
 
+// ========================================================
+// [Firebase Realtime Database 연동 설정]
+// - 반 친구들이 각자 스마트폰/컴퓨터로 신청해도 실시간 동기화
+// ========================================================
+const firebaseConfig = {
+  apiKey: "AIzaSyAwokSUQ9oyv8SzCixa5s0B1rz84mDs-DM",
+  authDomain: "classnote-75ff8.firebaseapp.com",
+  databaseURL: "https://classnote-75ff8-default-rtdb.firebaseio.com",
+  projectId: "classnote-75ff8",
+  storageBucket: "classnote-75ff8.firebasestorage.app",
+  messagingSenderId: "148059183324",
+  appId: "1:148059183324:web:458bae1c9988878d92bc19"
+};
+
+let firebaseDb = null;
+try {
+  if (typeof firebase !== "undefined") {
+    if (!firebase.apps || !firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    firebaseDb = firebase.database();
+  }
+} catch (e) {
+  console.warn("Firebase 초기화 중 알림 (로컬 저장소 모드로 작동):", e);
+}
+
 // 관리자 인증 여부 확인
 function isArchiveAdmin() {
   return localStorage.getItem(STORAGE_KEY_ADMIN_AUTH) === "true";
@@ -345,25 +371,63 @@ function setupJapaneseRequestForm() {
   const adminAuthBtn = document.getElementById("jpAdminAuthBtn");
   const adminAuthIcon = document.getElementById("jpAdminAuthIcon");
   const adminAuthBtnText = document.getElementById("jpAdminAuthBtnText");
+  const submitBtn = document.getElementById("jpSubmitBtn");
 
   if (!form || !numSelect || !nameInput || !listContainer) return;
 
-  function loadJpRequests() {
+  function loadJpRequestsLocal() {
     try {
       const data = localStorage.getItem(STORAGE_KEY_JP);
       return data ? JSON.parse(data) : [];
     } catch (e) {
-      console.error("일본어 신청 데이터 불러오기 오류:", e);
+      console.error("일본어 신청 로컬 데이터 불러오기 오류:", e);
       return [];
     }
   }
 
-  function saveJpRequests(list) {
+  function saveJpRequestsLocal(list) {
     try {
       localStorage.setItem(STORAGE_KEY_JP, JSON.stringify(list));
     } catch (e) {
-      console.error("일본어 신청 데이터 저장 오류:", e);
+      console.error("일본어 신청 로컬 데이터 저장 오류:", e);
     }
+  }
+
+  let jpRequestsList = loadJpRequestsLocal();
+
+  // Firebase 실시간 동기화 리스너
+  if (firebaseDb) {
+    firebaseDb.ref("jp_requests").on("value", (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        const list = Object.keys(data).map(key => {
+          const item = data[key];
+          return {
+            num: Number(item.num || key),
+            name: item.name || "",
+            createdAt: item.createdAt || ""
+          };
+        }).filter(it => it.num && it.name);
+
+        jpRequestsList = list;
+        saveJpRequestsLocal(list);
+      } else {
+        if (jpRequestsList.length > 0) {
+          // 기존 로컬 데이터가 있으면 Firebase로 마이그레이션 업로드
+          jpRequestsList.forEach(item => {
+            if (item.num && item.name) {
+              firebaseDb.ref("jp_requests/" + item.num).set(item);
+            }
+          });
+        } else {
+          jpRequestsList = [];
+          saveJpRequestsLocal([]);
+        }
+      }
+      renderJpList();
+    }, (error) => {
+      console.warn("Firebase jp_requests 동기화 알림:", error);
+    });
   }
 
   function updateJpAdminUI() {
@@ -384,7 +448,7 @@ function setupJapaneseRequestForm() {
   }
 
   function renderJpList() {
-    const list = loadJpRequests();
+    const list = [...jpRequestsList];
     const isAdmin = isArchiveAdmin();
 
     updateJpAdminUI();
@@ -449,9 +513,20 @@ function setupJapaneseRequestForm() {
         const displayName = targetItem ? `${targetItem.num}번 ${targetItem.name}` : `${targetNum}번`;
 
         if (confirm(`${displayName} 학생의 일본어 자료 신청을 취소하시겠습니까?`)) {
-          const updated = list.filter(it => Number(it.num) !== targetNum);
-          saveJpRequests(updated);
-          renderJpList();
+          if (firebaseDb) {
+            firebaseDb.ref("jp_requests/" + targetNum).remove()
+              .then(() => {
+                alert(`${displayName} 학생의 신청이 취소되었습니다.`);
+              })
+              .catch(err => {
+                console.error("Firebase 신청 취소 실패:", err);
+                alert("신청 취소 처리 중 오류가 발생했습니다.");
+              });
+          } else {
+            jpRequestsList = jpRequestsList.filter(it => Number(it.num) !== targetNum);
+            saveJpRequestsLocal(jpRequestsList);
+            renderJpList();
+          }
         }
       });
     });
@@ -480,8 +555,7 @@ function setupJapaneseRequestForm() {
       return;
     }
 
-    const currentList = loadJpRequests();
-    const existing = currentList.find(it => Number(it.num) === num);
+    const existing = jpRequestsList.find(it => Number(it.num) === num);
     if (existing) {
       if (isArchiveAdmin()) {
         alert(`이미 ${num}번(${existing.name}) 학생이 신청을 완료했습니다.\n번호를 잘못 선택하셨거나 수정을 원하시면 기존 신청을 취소한 후 다시 시도해주세요.`);
@@ -491,20 +565,37 @@ function setupJapaneseRequestForm() {
       return;
     }
 
-    currentList.push({
+    const newEntry = {
       num: num,
       name: name,
       createdAt: formatSimpleDate(new Date())
-    });
+    };
 
-    saveJpRequests(currentList);
-    renderJpList();
+    if (submitBtn) submitBtn.disabled = true;
 
-    // 폼 초기화
-    numSelect.value = "";
-    nameInput.value = "";
-
-    alert(`${num}번 ${name} 학생의 일본어 기말자료 신청이 완료되었습니다!`);
+    if (firebaseDb) {
+      firebaseDb.ref("jp_requests/" + num).set(newEntry)
+        .then(() => {
+          numSelect.value = "";
+          nameInput.value = "";
+          alert(`${num}번 ${name} 학생의 일본어 기말자료 신청이 완료되었습니다!`);
+        })
+        .catch(err => {
+          console.error("Firebase 신청 저장 오류:", err);
+          alert("신청 저장 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
+        })
+        .finally(() => {
+          if (submitBtn) submitBtn.disabled = false;
+        });
+    } else {
+      jpRequestsList.push(newEntry);
+      saveJpRequestsLocal(jpRequestsList);
+      renderJpList();
+      numSelect.value = "";
+      nameInput.value = "";
+      alert(`${num}번 ${name} 학생의 일본어 기말자료 신청이 완료되었습니다!`);
+      if (submitBtn) submitBtn.disabled = false;
+    }
   });
 
   // 명단 클립보드 복사 버튼 (관리자 전용)
@@ -515,7 +606,7 @@ function setupJapaneseRequestForm() {
         return;
       }
 
-      const list = loadJpRequests();
+      const list = [...jpRequestsList];
       if (list.length === 0) {
         alert("복사할 신청자 명단이 아직 없습니다.");
         return;
@@ -570,37 +661,87 @@ function setupAnonymousRequestForm() {
   const adminAuthBtn = document.getElementById("anonAdminAuthBtn");
   const adminAuthIcon = document.getElementById("adminAuthIcon");
   const adminAuthBtnText = document.getElementById("adminAuthBtnText");
+  const submitBtn = document.getElementById("anonSubmitBtn");
 
   if (!form || !subjSelect || !contentInput || !feedContainer) return;
 
-  function loadAnonRequests() {
-    try {
-      const data = localStorage.getItem(STORAGE_KEY_ANON);
-      if (data) return JSON.parse(data);
+  const STORAGE_KEY_LIKED = "daeryun_anon_liked_ids";
 
-      // 기본 데모 샘플 데이터 제공 (학우들이 형식과 분위기를 참고할 수 있도록)
-      return [
-        {
-          id: "anon-demo-1",
-          subject: "일본어",
-          content: "기말고사 시험범위 주요 단어랑 본문 필수 문형 정리 유인물도 혹시 올려주실 수 있나요?",
-          createdAt: "10.13",
-          likes: 3,
-          liked: false
-        }
-      ];
+  function getLikedIds() {
+    try {
+      const data = localStorage.getItem(STORAGE_KEY_LIKED);
+      return data ? JSON.parse(data) : [];
     } catch (e) {
-      console.error("익명 요청 데이터 불러오기 오류:", e);
       return [];
     }
   }
 
-  function saveAnonRequests(list) {
+  function setLikedId(id, isLiked) {
+    try {
+      let ids = getLikedIds();
+      if (isLiked) {
+        if (!ids.includes(id)) ids.push(id);
+      } else {
+        ids = ids.filter(it => it !== id);
+      }
+      localStorage.setItem(STORAGE_KEY_LIKED, JSON.stringify(ids));
+    } catch (e) {}
+  }
+
+  function getDefaultAnonSample() {
+    return [
+      {
+        id: "anon-demo-1",
+        subject: "일본어",
+        content: "기말고사 시험범위 주요 단어랑 본문 필수 문형 정리 유인물도 혹시 올려주실 수 있나요?",
+        createdAt: "10.13",
+        timestamp: 1728800000000,
+        likes: 3
+      }
+    ];
+  }
+
+  function loadAnonRequestsLocal() {
+    try {
+      const data = localStorage.getItem(STORAGE_KEY_ANON);
+      if (data) return JSON.parse(data);
+      return getDefaultAnonSample();
+    } catch (e) {
+      console.error("익명 요청 로컬 데이터 불러오기 오류:", e);
+      return getDefaultAnonSample();
+    }
+  }
+
+  function saveAnonRequestsLocal(list) {
     try {
       localStorage.setItem(STORAGE_KEY_ANON, JSON.stringify(list));
     } catch (e) {
-      console.error("익명 요청 데이터 저장 오류:", e);
+      console.error("익명 요청 로컬 데이터 저장 오류:", e);
     }
+  }
+
+  let anonRequestsList = loadAnonRequestsLocal();
+
+  // Firebase 실시간 동기화
+  if (firebaseDb) {
+    firebaseDb.ref("anon_requests").on("value", (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        const list = Object.keys(data).map(key => ({
+          ...data[key],
+          id: key
+        }));
+        list.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+        anonRequestsList = list;
+        saveAnonRequestsLocal(list);
+      } else {
+        anonRequestsList = getDefaultAnonSample();
+        saveAnonRequestsLocal(anonRequestsList);
+      }
+      renderAnonFeed();
+    }, (error) => {
+      console.warn("Firebase anon_requests 수신 알림:", error);
+    });
   }
 
   // 관리자 인증 버튼 UI 동기화
@@ -622,8 +763,9 @@ function setupAnonymousRequestForm() {
   }
 
   function renderAnonFeed() {
-    const list = loadAnonRequests();
+    const list = [...anonRequestsList];
     const isAdmin = isArchiveAdmin();
+    const likedIds = getLikedIds();
 
     if (countBadge) countBadge.textContent = list.length;
     updateAdminAuthUI();
@@ -640,34 +782,37 @@ function setupAnonymousRequestForm() {
 
     feedContainer.innerHTML = `
       <div class="anon-feed-list">
-        ${list.map(item => `
-          <div class="anon-feed-item" data-id="${item.id}">
-            <div class="anon-item-header">
-              <div class="anon-meta-left">
-                <span class="anon-subj-pill subj-${getSubjectColorClass(item.subject)}">${escapeHtml(item.subject)}</span>
-                <span class="anon-author"><i class="fa-solid fa-user-secret"></i> 익명의 학우</span>
+        ${list.map(item => {
+          const isLiked = likedIds.includes(item.id);
+          return `
+            <div class="anon-feed-item" data-id="${item.id}">
+              <div class="anon-item-header">
+                <div class="anon-meta-left">
+                  <span class="anon-subj-pill subj-${getSubjectColorClass(item.subject)}">${escapeHtml(item.subject)}</span>
+                  <span class="anon-author"><i class="fa-solid fa-user-secret"></i> 익명의 학우</span>
+                </div>
+                <div class="anon-meta-right">
+                  <span class="anon-time">${item.createdAt || ""}</span>
+                  ${isAdmin ? `
+                    <button type="button" class="btn-anon-delete" data-id="${item.id}" title="요청 글 삭제 (관리자 전용)">
+                      <i class="fa-regular fa-trash-can"></i>
+                    </button>
+                  ` : ""}
+                </div>
               </div>
-              <div class="anon-meta-right">
-                <span class="anon-time">${item.createdAt}</span>
-                ${isAdmin ? `
-                  <button type="button" class="btn-anon-delete" data-id="${item.id}" title="요청 글 삭제 (관리자 전용)">
-                    <i class="fa-regular fa-trash-can"></i>
-                  </button>
-                ` : ""}
+              <div class="anon-item-body">
+                <p class="anon-content-text">${escapeHtml(item.content)}</p>
+              </div>
+              <div class="anon-item-footer">
+                <button type="button" class="btn-anon-like ${isLiked ? 'active' : ''}" data-id="${item.id}">
+                  <i class="fa-${isLiked ? 'solid' : 'regular'} fa-heart"></i>
+                  <span>나도 필요해요</span>
+                  <strong class="like-count">${item.likes || 0}</strong>
+                </button>
               </div>
             </div>
-            <div class="anon-item-body">
-              <p class="anon-content-text">${escapeHtml(item.content)}</p>
-            </div>
-            <div class="anon-item-footer">
-              <button type="button" class="btn-anon-like ${item.liked ? 'active' : ''}" data-id="${item.id}">
-                <i class="fa-${item.liked ? 'solid' : 'regular'} fa-heart"></i>
-                <span>나도 필요해요</span>
-                <strong class="like-count">${item.likes || 0}</strong>
-              </button>
-            </div>
-          </div>
-        `).join("")}
+          `;
+        }).join("")}
       </div>
     `;
 
@@ -676,20 +821,30 @@ function setupAnonymousRequestForm() {
     likeBtns.forEach(btn => {
       btn.addEventListener("click", () => {
         const id = btn.getAttribute("data-id");
-        const currentList = loadAnonRequests();
-        const target = currentList.find(it => it.id === id);
-        if (!target) return;
+        const currentLikedIds = getLikedIds();
+        const hasLiked = currentLikedIds.includes(id);
 
-        if (target.liked) {
-          target.liked = false;
-          target.likes = Math.max(0, (target.likes || 1) - 1);
+        if (hasLiked) {
+          setLikedId(id, false);
+          if (firebaseDb && !id.startsWith("anon-demo-")) {
+            firebaseDb.ref("anon_requests/" + id + "/likes").transaction(cur => Math.max(0, (cur || 1) - 1));
+          } else {
+            const target = anonRequestsList.find(it => it.id === id);
+            if (target) target.likes = Math.max(0, (target.likes || 1) - 1);
+            saveAnonRequestsLocal(anonRequestsList);
+            renderAnonFeed();
+          }
         } else {
-          target.liked = true;
-          target.likes = (target.likes || 0) + 1;
+          setLikedId(id, true);
+          if (firebaseDb && !id.startsWith("anon-demo-")) {
+            firebaseDb.ref("anon_requests/" + id + "/likes").transaction(cur => (cur || 0) + 1);
+          } else {
+            const target = anonRequestsList.find(it => it.id === id);
+            if (target) target.likes = (target.likes || 0) + 1;
+            saveAnonRequestsLocal(anonRequestsList);
+            renderAnonFeed();
+          }
         }
-
-        saveAnonRequests(currentList);
-        renderAnonFeed();
       });
     });
 
@@ -705,10 +860,20 @@ function setupAnonymousRequestForm() {
 
           const id = btn.getAttribute("data-id");
           if (confirm("이 익명 요청 글을 삭제하시겠습니까? (관리자 권한)")) {
-            const currentList = loadAnonRequests();
-            const updated = currentList.filter(it => it.id !== id);
-            saveAnonRequests(updated);
-            renderAnonFeed();
+            if (firebaseDb && !id.startsWith("anon-demo-")) {
+              firebaseDb.ref("anon_requests/" + id).remove()
+                .then(() => {
+                  alert("요청 글이 삭제되었습니다.");
+                })
+                .catch(err => {
+                  console.error("Firebase 글 삭제 오류:", err);
+                  alert("삭제 처리 중 오류가 발생했습니다.");
+                });
+            } else {
+              anonRequestsList = anonRequestsList.filter(it => it.id !== id);
+              saveAnonRequestsLocal(anonRequestsList);
+              renderAnonFeed();
+            }
           }
         });
       });
@@ -738,24 +903,40 @@ function setupAnonymousRequestForm() {
       return;
     }
 
-    const currentList = loadAnonRequests();
     const newItem = {
-      id: "anon_" + Date.now() + "_" + Math.floor(Math.random() * 1000),
       subject: subject,
       content: content,
       createdAt: formatSimpleDate(new Date()),
-      likes: 0,
-      liked: false
+      timestamp: Date.now(),
+      likes: 0
     };
 
-    currentList.unshift(newItem); // 최신글 상단 추가
-    saveAnonRequests(currentList);
-    renderAnonFeed();
+    if (submitBtn) submitBtn.disabled = true;
 
-    // 폼 리셋
-    contentInput.value = "";
-
-    alert("익명 자료 요청이 성공적으로 등록되었습니다!");
+    if (firebaseDb) {
+      const newRef = firebaseDb.ref("anon_requests").push();
+      newItem.id = newRef.key;
+      newRef.set(newItem)
+        .then(() => {
+          contentInput.value = "";
+          alert("익명 자료 요청이 성공적으로 등록되었습니다!");
+        })
+        .catch(err => {
+          console.error("Firebase 익명요청 등록 실패:", err);
+          alert("등록 중 오류가 발생했습니다. 네트워크 연결을 확인해주세요.");
+        })
+        .finally(() => {
+          if (submitBtn) submitBtn.disabled = false;
+        });
+    } else {
+      newItem.id = "anon_" + Date.now();
+      anonRequestsList.unshift(newItem);
+      saveAnonRequestsLocal(anonRequestsList);
+      renderAnonFeed();
+      contentInput.value = "";
+      alert("익명 자료 요청이 성공적으로 등록되었습니다!");
+      if (submitBtn) submitBtn.disabled = false;
+    }
   });
 
   // 초기 렌더링 및 모듈 등록
