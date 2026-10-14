@@ -7,6 +7,24 @@
 // 등록된 과목별 학습 자료 그룹 (과목명별 상자 / 윈도우 폴더 구조)
 const archiveSubjectGroups = [
   {
+    groupId: "grp-kor",
+    subjectName: "화법과 언어",
+    description: "2학년 4반 정규 수업 및 수행 대비 교과서 전문 전자책(PDF)",
+    files: [
+      {
+        id: "mat-kor-1",
+        title: "화법과 언어 교과서",
+        fileName: "화법과 언어 교과서.pdf",
+        filePath: "https://drive.google.com/file/d/1YQDINMxPClS8pFRWng0KO_xqpK4Nxrz9/view?usp=sharing",
+        downloadUrl: "https://drive.google.com/uc?export=download&id=1YQDINMxPClS8pFRWng0KO_xqpK4Nxrz9",
+        fileSize: "219.3 MB",
+        fileExt: "PDF",
+        uploadDate: "2026.10.14",
+        isExternal: true
+      }
+    ]
+  },
+  {
     groupId: "grp-math",
     subjectName: "수학",
     description: "미적분II 및 확률과 통계 교과서 전문 전자책(PDF)",
@@ -244,7 +262,9 @@ function renderArchiveMaterials() {
 
           <div class="folder-files-container">
             ${group.files.map(file => {
-              const encodedUrl = encodeURI(file.filePath);
+              const isExternal = file.filePath.startsWith("http");
+              const previewUrl = isExternal ? file.filePath : encodeURI(file.filePath);
+              const downloadUrl = file.downloadUrl || previewUrl;
               return `
                 <div class="folder-file-row">
                   <div class="file-row-left">
@@ -256,14 +276,15 @@ function renderArchiveMaterials() {
                       <div class="file-meta">
                         <span class="file-size-tag"><i class="fa-regular fa-hard-drive"></i> ${file.fileSize}</span>
                         <span class="file-date-tag"><i class="fa-regular fa-calendar"></i> ${file.uploadDate}</span>
+                        ${isExternal ? '<span class="file-cloud-tag" style="color:#0284c7;font-weight:600;"><i class="fa-brands fa-google-drive"></i> 구글 드라이브</span>' : ''}
                       </div>
                     </div>
                   </div>
                   <div class="file-row-actions">
-                    <a href="${encodedUrl}" target="_blank" rel="noopener noreferrer" class="btn-file-preview" title="새 탭에서 PDF 열람">
+                    <a href="${previewUrl}" target="_blank" rel="noopener noreferrer" class="btn-file-preview" title="새 탭에서 PDF 열람">
                       <i class="fa-solid fa-arrow-up-right-from-square"></i> <span>바로보기</span>
                     </a>
-                    <a href="${encodedUrl}" download="${escapeHtml(file.fileName)}" class="btn-file-download" title="기기에 파일 다운로드">
+                    <a href="${downloadUrl}" ${isExternal ? 'target="_blank" rel="noopener noreferrer"' : `download="${escapeHtml(file.fileName)}"`} class="btn-file-download" title="기기에 파일 다운로드">
                       <i class="fa-solid fa-download"></i> <span>다운로드</span>
                     </a>
                   </div>
