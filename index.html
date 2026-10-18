@@ -10,8 +10,8 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
   <!-- CSS 분리 구조: 공통 베이스 스타일 & 카테고리별 컨텐츠 스타일 -->
-  <link rel="stylesheet" href="css/common.css?v=17">
-  <link rel="stylesheet" href="css/content.css?v=17">
+  <link rel="stylesheet" href="css/common.css?v=18">
+  <link rel="stylesheet" href="css/content.css?v=18">
 </head>
 <body>
   <!-- 상단 풀와이드 헤더 & 글로벌 네비게이션 (와이드 배너 디자인) -->
@@ -301,38 +301,19 @@
       <div class="section-header">
         <div>
           <h2 class="section-title"><i class="fa-solid fa-folder-open"></i> 학급 자료실</h2>
-          <p class="section-desc">학습 자료 및 유인물 다운로드, 맞춤형 학습 자료 신청 게시판</p>
-        </div>
-        <!-- 자료실 / 자료신청 2대 서브 탭 -->
-        <div class="archive-subtab-controls">
-          <button class="archive-subtab-btn active" data-archive-tab="repo">
-            <i class="fa-solid fa-folder"></i> 자료실
-          </button>
-          <button class="archive-subtab-btn" data-archive-tab="request">
-            <i class="fa-solid fa-pen-to-square"></i> 자료신청
-          </button>
+          <p class="section-desc">교과별 전자 교과서 및 기출 학습 자료 다운로드, 2학기 기말고사 일본어 자료 신청</p>
         </div>
       </div>
 
-      <!-- 1) 자료실 패널 (내용 비워둠) -->
-      <div class="archive-tab-panel active" id="archiveRepoPanel">
-        <div class="card-box archive-empty-card">
-          <div class="empty-state-visual">
-            <i class="fa-regular fa-folder-open"></i>
-          </div>
-          <h3 class="empty-state-title">등록된 학습 자료가 없습니다</h3>
-          <p class="empty-state-sub">추후 업로드되는 교과 수업 자료, 유인물, 모의고사 기출 분석 자료가 이곳에 표시됩니다.</p>
-          <div class="archive-list-container" id="archiveRepoList">
-            <!-- 추후 자료를 추가할 영역 (현재 비워둠) -->
-          </div>
+      <!-- 통합 2열 레이아웃: [왼쪽 반] 교과 자료실 | [오른쪽 반] 일본어 기말자료 신청 -->
+      <div class="archive-unified-grid">
+        <!-- [왼쪽 반] 교과 학습 자료실 목록 -->
+        <div class="archive-col-materials" id="archiveRepoPanel">
+          <!-- JS 동적 렌더링 (툴바 & 과목별 폴더 목록) -->
         </div>
-      </div>
 
-      <!-- 2) 자료신청 패널 (일본어 기말자료 신청 & 자유 익명 자료 요청) -->
-      <div class="archive-tab-panel" id="archiveRequestPanel">
-        <div class="archive-requests-grid">
-
-          <!-- [박스 1] 일본어 기말자료 신청 -->
+        <!-- [오른쪽 반] 일본어 기말자료 신청 -->
+        <div class="archive-col-request" id="archiveJpPanel">
           <div class="card-box request-card-box" id="jpRequestBox">
             <div class="request-box-header">
               <div class="request-header-icon jp-icon">
@@ -443,59 +424,6 @@
               </div>
             </div>
           </div>
-
-          <!-- [박스 2] 자유 익명 자료 요청 -->
-          <div class="card-box request-card-box" id="anonRequestBox">
-            <div class="request-box-header">
-              <div class="request-header-icon anon-icon">
-                <i class="fa-solid fa-user-secret"></i>
-              </div>
-              <div class="request-header-text">
-                <h3 class="request-box-title">자유 익명 자료 요청</h3>
-                <p class="request-box-desc">이름 없이 100% 익명으로 필요한 교과자료, 기출문제, 보충유인물을 자유롭게 요청하세요.</p>
-              </div>
-            </div>
-
-            <form class="request-form" id="anonRequestForm">
-              <div class="form-field-item">
-                <div class="form-label-row">
-                  <label for="anonSubjectSelect" class="form-field-label">희망 과목</label>
-                  <span class="anon-secure-pill"><i class="fa-solid fa-shield-halved"></i> 100% 익명 보장</span>
-                </div>
-                <select id="anonSubjectSelect" class="form-control form-select">
-                  <option value="공통/기타">공통 / 기타</option>
-                  <option value="국어">국어</option>
-                  <option value="수학">수학</option>
-                  <option value="영어">영어</option>
-                  <option value="과학">과학</option>
-                  <option value="일본어">일본어</option>
-                </select>
-              </div>
-
-              <div class="form-field-item">
-                <label for="anonContent" class="form-field-label">요청 내용</label>
-                <textarea id="anonContent" class="form-control form-textarea" rows="3" placeholder="어떤 학습 자료나 기출문제가 필요한지 자유롭게 적어주세요!" required></textarea>
-              </div>
-
-              <button type="submit" class="btn-primary btn-request-action" id="anonSubmitBtn">
-                <i class="fa-solid fa-pen-nib"></i> 익명으로 요청 등록하기
-              </button>
-            </form>
-
-            <!-- 익명 요청 피드 목록 -->
-            <div class="request-status-wrap">
-              <div class="request-status-bar">
-                <span class="request-status-label"><i class="fa-solid fa-comments"></i> 실시간 요청 피드 (<strong id="anonCountBadge">0</strong>건)</span>
-                <button type="button" class="btn-admin-auth" id="anonAdminAuthBtn" title="관리자 인증 (글 삭제 권한 활성화)">
-                  <i class="fa-solid fa-lock" id="adminAuthIcon"></i> <span id="adminAuthBtnText">관리자</span>
-                </button>
-              </div>
-              <div class="request-feed-container" id="anonFeedContainer">
-                <!-- JS 동적 렌더링 -->
-              </div>
-            </div>
-          </div>
-
         </div>
       </div>
     </section>
@@ -534,11 +462,11 @@
 
   <!-- 자바스크립트 분리 로드 -->
   <!-- 카테고리별 독립 로직 (데이터 & 기능) -->
-  <script src="js/notice.js?v=17"></script>
-  <script src="js/schedule.js?v=17"></script>
-  <script src="js/meal.js?v=17"></script>
-  <script src="js/etc.js?v=17"></script>
+  <script src="js/notice.js?v=18"></script>
+  <script src="js/schedule.js?v=18"></script>
+  <script src="js/meal.js?v=18"></script>
+  <script src="js/etc.js?v=18"></script>
   <!-- 메인 컨트롤러 (탭 전환 및 전체 초기화) -->
-  <script src="js/main.js?v=17"></script>
+  <script src="js/main.js?v=18"></script>
 </body>
 </html>
