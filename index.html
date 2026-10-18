@@ -10,8 +10,8 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
   <!-- CSS 분리 구조: 공통 베이스 스타일 & 카테고리별 컨텐츠 스타일 -->
-  <link rel="stylesheet" href="css/common.css?v=13">
-  <link rel="stylesheet" href="css/content.css?v=13">
+  <link rel="stylesheet" href="css/common.css?v=17">
+  <link rel="stylesheet" href="css/content.css?v=17">
 </head>
 <body>
   <!-- 상단 풀와이드 헤더 & 글로벌 네비게이션 (와이드 배너 디자인) -->
@@ -340,7 +340,48 @@
               </div>
               <div class="request-header-text">
                 <h3 class="request-box-title">일본어 기말자료 신청</h3>
-                <p class="request-box-desc">기말고사 대비 일본어 학습자료 수령 희망자는 번호와 이름을 입력해주세요.</p>
+                <p class="request-box-desc">2학기 기말고사 대비 일본어 학습자료 수령 신청 양식입니다.</p>
+              </div>
+            </div>
+
+            <!-- 2학기 기말고사 구성 안내 카드 -->
+            <div class="jp-material-desc-wrap">
+              <div class="jp-curriculum-badge">
+                <i class="fa-solid fa-layer-group"></i> 2학기 기말고사 자료 구성
+              </div>
+              
+              <div class="jp-tier-list">
+                <!-- [A] 기말자료 -->
+                <div class="jp-tier-card tier-a">
+                  <div class="tier-card-header">
+                    <span class="tier-tag tag-a">[A] 기말자료</span>
+                  </div>
+                  <ul class="tier-features">
+                    <li><i class="fa-solid fa-check"></i> 개념 (교과서/프린트)</li>
+                    <li><i class="fa-solid fa-check"></i> 단어/문장 빈칸 T</li>
+                    <li><i class="fa-solid fa-check"></i> 모의고사 1/2회</li>
+                    <li><i class="fa-solid fa-check"></i> 서술형 배열 기능추가 (웹사이트)</li>
+                  </ul>
+                </div>
+
+                <!-- [B] FINAL 자료(+) -->
+                <div class="jp-tier-card tier-b">
+                  <div class="tier-card-header">
+                    <span class="tier-tag tag-b">[B] FINAL 자료 (+)</span>
+                  </div>
+                  <ul class="tier-features">
+                    <li><i class="fa-solid fa-check"></i> 개념 (PPT/문법정리)</li>
+                    <li><i class="fa-solid fa-check"></i> 서술형 50제</li>
+                    <li><i class="fa-solid fa-check"></i> 모의고사 3/4회</li>
+                    <li><i class="fa-solid fa-check"></i> FINAL 요약본</li>
+                  </ul>
+                </div>
+              </div>
+
+              <!-- 안내/유의사항 -->
+              <div class="jp-tier-notice">
+                <i class="fa-solid fa-circle-info"></i>
+                <p><strong>[B]</strong>에는 <strong>[A]</strong>의 구성이 포함되어 있으며, <strong>시험 1주일 전부터만 판매</strong>함.</p>
               </div>
             </div>
 
@@ -349,7 +390,7 @@
                 <div class="form-field-item">
                   <label for="jpStudentNum" class="form-field-label">출석번호</label>
                   <select id="jpStudentNum" class="form-control form-select" required>
-                    <option value="">번호 선택 (1~24)</option>
+                    <option value="">출석번호 선택</option>
                     <option value="1">1번</option>
                     <option value="2">2번</option>
                     <option value="3">3번</option>
@@ -433,7 +474,7 @@
 
               <div class="form-field-item">
                 <label for="anonContent" class="form-field-label">요청 내용</label>
-                <textarea id="anonContent" class="form-control form-textarea" rows="3" placeholder="어떤 학습 자료나 기출문제가 필요한지 자유롭게 적어주세요! (예: 세포와 물질대사 핵심 요약본 올려주세요, 미적분 작년 기출 풀이 부탁드립니다 등)" required></textarea>
+                <textarea id="anonContent" class="form-control form-textarea" rows="3" placeholder="어떤 학습 자료나 기출문제가 필요한지 자유롭게 적어주세요!" required></textarea>
               </div>
 
               <button type="submit" class="btn-primary btn-request-action" id="anonSubmitBtn">
@@ -493,11 +534,11 @@
 
   <!-- 자바스크립트 분리 로드 -->
   <!-- 카테고리별 독립 로직 (데이터 & 기능) -->
-  <script src="js/notice.js?v=16"></script>
-  <script src="js/schedule.js?v=16"></script>
-  <script src="js/meal.js?v=16"></script>
-  <script src="js/etc.js?v=16"></script>
+  <script src="js/notice.js?v=17"></script>
+  <script src="js/schedule.js?v=17"></script>
+  <script src="js/meal.js?v=17"></script>
+  <script src="js/etc.js?v=17"></script>
   <!-- 메인 컨트롤러 (탭 전환 및 전체 초기화) -->
-  <script src="js/main.js?v=16"></script>
+  <script src="js/main.js?v=17"></script>
 </body>
 </html>

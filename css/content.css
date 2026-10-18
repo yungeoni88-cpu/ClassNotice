@@ -1930,6 +1930,130 @@
   word-break: keep-all;
 }
 
+/* 2학기 기말고사 구성 안내 카드 */
+.jp-material-desc-wrap {
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: var(--radius-md);
+  padding: 0.95rem;
+  margin-bottom: 1.15rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.jp-curriculum-badge {
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: var(--primary-color);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.jp-tier-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.jp-tier-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: var(--radius-sm);
+  padding: 0.7rem 0.85rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+
+.jp-tier-card.tier-a {
+  border-left: 3.5px solid #059669;
+}
+
+.jp-tier-card.tier-b {
+  border-left: 3.5px solid #d97706;
+}
+
+.tier-card-header {
+  margin-bottom: 0.45rem;
+}
+
+.tier-tag {
+  font-size: 0.84rem;
+  font-weight: 800;
+  display: inline-block;
+}
+
+.tag-a {
+  color: #065f46;
+}
+
+.tag-b {
+  color: #b45309;
+}
+
+.tier-features {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.35rem 0.65rem;
+}
+
+@media (max-width: 600px) {
+  .tier-features {
+    grid-template-columns: 1fr;
+    gap: 0.3rem;
+  }
+}
+
+.tier-features li {
+  font-size: 0.78rem;
+  color: #334155;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.35rem;
+  line-height: 1.35;
+  word-break: keep-all;
+}
+
+.tier-features li i {
+  font-size: 0.72rem;
+  margin-top: 0.2rem;
+  flex-shrink: 0;
+}
+
+.tier-a .tier-features li i {
+  color: #10b981;
+}
+
+.tier-b .tier-features li i {
+  color: #f59e0b;
+}
+
+.jp-tier-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.45rem;
+  background-color: #fffbeb;
+  border: 1px dashed #fcd34d;
+  border-radius: var(--radius-sm);
+  padding: 0.55rem 0.75rem;
+  font-size: 0.76rem;
+  color: #92400e;
+  line-height: 1.4;
+}
+
+.jp-tier-notice i {
+  margin-top: 0.15rem;
+  color: #d97706;
+  flex-shrink: 0;
+}
+
+.jp-tier-notice p {
+  margin: 0;
+}
+
 /* 폼 스타일 */
 .request-form {
   display: flex;

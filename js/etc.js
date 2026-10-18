@@ -710,26 +710,20 @@ function setupAnonymousRequestForm() {
   }
 
   function getDefaultAnonSample() {
-    return [
-      {
-        id: "anon-demo-1",
-        subject: "일본어",
-        content: "기말고사 시험범위 주요 단어랑 본문 필수 문형 정리 유인물도 혹시 올려주실 수 있나요?",
-        createdAt: "10.13",
-        timestamp: 1728800000000,
-        likes: 3
-      }
-    ];
+    return [];
   }
 
   function loadAnonRequestsLocal() {
     try {
       const data = localStorage.getItem(STORAGE_KEY_ANON);
-      if (data) return JSON.parse(data);
-      return getDefaultAnonSample();
+      if (data) {
+        const parsed = JSON.parse(data);
+        return Array.isArray(parsed) ? parsed.filter(item => item && item.id !== "anon-demo-1") : [];
+      }
+      return [];
     } catch (e) {
       console.error("익명 요청 로컬 데이터 불러오기 오류:", e);
-      return getDefaultAnonSample();
+      return [];
     }
   }
 
@@ -748,16 +742,19 @@ function setupAnonymousRequestForm() {
     firebaseDb.ref("anon_requests").on("value", (snapshot) => {
       const data = snapshot.val();
       if (data) {
-        const list = Object.keys(data).map(key => ({
-          ...data[key],
-          id: key
-        }));
+        const list = Object.keys(data)
+          .filter(key => key !== "anon-demo-1")
+          .map(key => ({
+            ...data[key],
+            id: key
+          }))
+          .filter(item => item && item.id !== "anon-demo-1");
         list.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
         anonRequestsList = list;
         saveAnonRequestsLocal(list);
       } else {
-        anonRequestsList = getDefaultAnonSample();
-        saveAnonRequestsLocal(anonRequestsList);
+        anonRequestsList = [];
+        saveAnonRequestsLocal([]);
       }
       renderAnonFeed();
     }, (error) => {
