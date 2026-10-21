@@ -1,15 +1,17 @@
 /**
  * [schedule.js] 학급일정 카테고리 로직
- * - 2학년 4반 해당 월(10월) 학사일정 관리
- * - 일정 제목에 따른 자동 카테고리 분류 ('모의고사', '수행평가', '학사일정')
+ * - 2학년 4반 학사 및 수행평가, 지필고사 일정 관리 (10월, 11월, 12월 학사일정)
+ * - 일정 제목에 따른 자동 카테고리 분류 ('모의고사/기말고사/수능', '수행', '축제', '방학', '헌혈', '학사일정')
+ * - 월 이동 네비게이션 (<, 오늘, >) 지원으로 다가오는 달 일정 조회
  * - 캘린더 날짜 클릭 시 우측 박스에 해당 일자의 상세 수행/시험 정보 카드 렌더링
- * - D-Day 카드 및 카테고리별 색상 닷 인디케이터
+ * - D-Day 카드 목록 페이징 및 카테고리별 색상 닷 인디케이터
  */
 
 // ==============================================================================
-// 📅 [2학년 4반 학사일정 목록] - 사용자가 요청한 일정 데이터 ('수행평가' -> '수행')
+// 📅 [2학년 4반 학사 및 수행/시험 일정 목록]
 // ==============================================================================
 const calendarEvents = [
+  // 10월 일정
   { date: "2026-10-12", title: "영어II 수행 1&2차시" },
   { date: "2026-10-13", title: "영어II 수행 3차시" },
   { date: "2026-10-14", title: "영어II 수행 4차시" },
@@ -24,28 +26,35 @@ const calendarEvents = [
   { date: "2026-10-23", title: "영어 발표와 토론 수행 2차시" },
   { date: "2026-10-23", title: "화법과 언어 수행 1차시" },
   { date: "2026-10-26", title: "영어 발표와 토론 수행 3차시" },
+  { date: "2026-10-26", title: "스포츠 문화(농구)" },
   { date: "2026-10-27", title: "영어 발표와 토론 수행 4차시" },
   { date: "2026-10-28", title: "현장체험학습" },
-  { date: "2026-10-30", title: "화법과 언어 수행 2차시" }
-];
+  { date: "2026-10-30", title: "화법과 언어 수행 2차시" },
 
-// 📋 [11월 예정 수행평가 대기 목록] - 11월 학사일정 업데이트 시 자동 반영
-const pendingNovemberEvents = [
+  // 11월 일정
   { date: "2026-11-06", title: "화법과 언어 수행 3차시" },
-  { date: "2026-11-13", title: "화법과 언어 수행 4차시" }
+  { date: "2026-11-13", title: "화법과 언어 수행 4차시" },
+  { date: "2026-11-19", title: "대학수학능력시험 (등교X)" },
+
+  // 12월 일정
+  { date: "2026-12-08", title: "기말고사 DAY1" },
+  { date: "2026-12-09", title: "기말고사 DAY2" },
+  { date: "2026-12-10", title: "기말고사 DAY3" },
+  { date: "2026-12-11", title: "기말고사 DAY4" },
+  { date: "2026-12-23", title: "대륜제" },
+  { date: "2026-12-24", title: "대륜제" },
+  { date: "2026-12-28", title: "헌혈" },
+  { date: "2026-12-31", title: "겨울방학식" }
 ];
 
-// 상단 D-Day 주요 요약 카드 목록
-const ddayList = [
-  { title: "영어II 수행 (1&2차시)", targetDate: "2026-10-12" },
-  { title: "세포와 물질대사 수행 1차시", targetDate: "2026-10-15" },
-  { title: "10월 모의고사", targetDate: "2026-10-20" },
-  { title: "현장체험학습", targetDate: "2026-10-28" }
-];
+// 현재 캘린더 표시 연/월 (기본: 2026년 10월)
+const nowObj = new Date();
+let currentCalYear = 2026;
+let currentCalMonth = (nowObj.getFullYear() === 2026 && nowObj.getMonth() >= 9 && nowObj.getMonth() <= 11)
+  ? nowObj.getMonth()
+  : 9; // 0-based: 9는 10월
 
-// 고정된 현재 해당 월 기준 (2026년 10월)
-const fixedYear = 2026;
-const fixedMonth = 9; // 0-based: 9는 10월
+let isCalNavBound = false;
 
 /**
  * ⏰ 당일 일정 및 과거 일정이 만료되었는지 판별하는 함수
@@ -98,12 +107,12 @@ function getInitialSelectedDate() {
   const d = String(target.getDate()).padStart(2, "0");
   const targetDateStr = `${y}-${m}-${d}`;
 
-  // 만약 10월(해당 학사일정 월) 범위 내에 있다면 그 날짜 반환
-  if (target.getFullYear() === fixedYear && target.getMonth() === fixedMonth) {
+  // 만약 2026년 학사일정 범위(10~12월) 내라면 해당 일자 반환
+  if (target.getFullYear() === 2026 && target.getMonth() >= 9 && target.getMonth() <= 11) {
     return targetDateStr;
   }
 
-  // 그 외의 경우 기본값: 만료되지 않은 첫 번째 일정 날짜 또는 10월 12일
+  // 그 외의 경우 기본값: 만료되지 않은 첫 번째 일정 날짜 또는 첫 등록 일정
   const sorted = [...calendarEvents].sort((a, b) => new Date(a.date) - new Date(b.date));
   const firstUpcoming = sorted.find(e => !isEventExpired(e.date));
   return firstUpcoming ? firstUpcoming.date : "2026-10-12";
@@ -114,17 +123,25 @@ let selectedCalendarDate = getInitialSelectedDate();
 
 /**
  * 🏷️ 제목 기반 자동 카테고리 분류 함수
- * - '모의고사' 포함 시 -> [모의고사]
- * - '수행' 포함 시 -> [수행]
- * - 그 외 -> [학사일정]
+ * - '모의고사', '기말고사', '수능', '시험' -> [시험/모의고사] (빨간색)
+ * - '수행' -> [수행] (파란색)
+ * - '대륜제', '축제' -> [축제] (보라색)
+ * - '방학' -> [방학] (하늘색)
+ * - '헌혈' -> [헌혈] (로즈레드)
+ * - 그 외 -> [학사일정] (슬레이트 그레이)
  */
 function getEventCategory(title) {
   const safeTitle = typeof title === 'string' ? title : '';
 
-  if (safeTitle.includes("모의고사")) {
+  if (safeTitle.includes("모의고사") || safeTitle.includes("기말고사") || safeTitle.includes("수능") || safeTitle.includes("대학수학능력시험") || safeTitle.includes("시험")) {
+    let catName = "모의고사";
+    if (safeTitle.includes("기말고사")) catName = "기말고사";
+    else if (safeTitle.includes("수능") || safeTitle.includes("대학수학능력시험")) catName = "수능";
+    else if (safeTitle.includes("시험")) catName = "시험";
+
     return {
-      key: "mock-exam",
-      name: "모의고사",
+      key: "exam",
+      name: catName,
       icon: "fa-solid fa-file-pen",
       badgeClass: "badge-mock-exam",
       itemClass: "cat-mock-exam",
@@ -142,6 +159,42 @@ function getEventCategory(title) {
       itemClass: "cat-performance",
       dotClass: "dot-performance",
       themeColor: "#2563eb"
+    };
+  }
+
+  if (safeTitle.includes("대륜제") || safeTitle.includes("축제")) {
+    return {
+      key: "festival",
+      name: "축제",
+      icon: "fa-solid fa-masks-theater",
+      badgeClass: "badge-festival",
+      itemClass: "cat-festival",
+      dotClass: "dot-festival",
+      themeColor: "#8b5cf6"
+    };
+  }
+
+  if (safeTitle.includes("방학")) {
+    return {
+      key: "vacation",
+      name: "방학",
+      icon: "fa-solid fa-snowflake",
+      badgeClass: "badge-vacation",
+      itemClass: "cat-vacation",
+      dotClass: "dot-vacation",
+      themeColor: "#0284c7"
+    };
+  }
+
+  if (safeTitle.includes("헌혈")) {
+    return {
+      key: "blood-donation",
+      name: "헌혈",
+      icon: "fa-solid fa-heart-pulse",
+      badgeClass: "badge-blood",
+      itemClass: "cat-blood",
+      dotClass: "dot-blood",
+      themeColor: "#e11d48"
     };
   }
 
@@ -165,6 +218,7 @@ let isDdayNavBound = false;
 function initScheduleModule() {
   renderDdayCards();
   bindDdayNavEvents();
+  bindCalendarNavEvents();
   renderFixedMonthCalendar();
   renderSelectedDateDetails(selectedCalendarDate);
 }
@@ -310,16 +364,87 @@ function bindDdayNavEvents() {
 }
 
 /**
- * 달력 넘김 없이 해당 월(10월)만 고정 렌더링
+ * 캘린더 네비게이션 (이전 달 / 다음 달 / 오늘) 이벤트 바인딩
+ */
+function bindCalendarNavEvents() {
+  if (isCalNavBound) return;
+
+  const prevBtn = document.getElementById("calPrevMonthBtn");
+  const nextBtn = document.getElementById("calNextMonthBtn");
+  const todayBtn = document.getElementById("calTodayBtn");
+
+  if (prevBtn) {
+    prevBtn.addEventListener("click", () => changeCalendarMonth(-1));
+  }
+  if (nextBtn) {
+    nextBtn.addEventListener("click", () => changeCalendarMonth(1));
+  }
+  if (todayBtn) {
+    todayBtn.addEventListener("click", () => goToTodayMonth());
+  }
+
+  isCalNavBound = true;
+}
+
+/**
+ * 월 이동 함수
+ */
+function changeCalendarMonth(delta) {
+  currentCalMonth += delta;
+  if (currentCalMonth < 0) {
+    currentCalMonth = 11;
+    currentCalYear--;
+  } else if (currentCalMonth > 11) {
+    currentCalMonth = 0;
+    currentCalYear++;
+  }
+
+  // 이동한 월의 첫 번째 등록 일정 또는 1일 자동 선택
+  const monthStr = String(currentCalMonth + 1).padStart(2, "0");
+  const monthPrefix = `${currentCalYear}-${monthStr}`;
+  const firstEventInMonth = calendarEvents.find(ev => ev.date.startsWith(monthPrefix));
+
+  if (firstEventInMonth) {
+    selectedCalendarDate = firstEventInMonth.date;
+  } else {
+    selectedCalendarDate = `${monthPrefix}-01`;
+  }
+
+  renderFixedMonthCalendar();
+  renderSelectedDateDetails(selectedCalendarDate);
+}
+
+/**
+ * 현재 월로 복귀
+ */
+function goToTodayMonth() {
+  const now = new Date();
+  currentCalYear = 2026;
+  currentCalMonth = (now.getFullYear() === 2026 && now.getMonth() >= 9 && now.getMonth() <= 11)
+    ? now.getMonth()
+    : 9;
+  selectedCalendarDate = getInitialSelectedDate();
+  renderFixedMonthCalendar();
+  renderSelectedDateDetails(selectedCalendarDate);
+}
+
+/**
+ * 캘린더 렌더링
+ * - 현재 선택된 연/월(currentCalYear, currentCalMonth)을 기준으로 달력 그리드 생성
  * - 날짜 클릭 시 우측 정보 박스 갱신 및 선택 셀 하이라이트
  */
 function renderFixedMonthCalendar() {
-  const year = fixedYear;
-  const month = fixedMonth; // 10월 (index 9)
+  const year = currentCalYear;
+  const month = currentCalMonth;
 
   const titleEl = document.getElementById("calendarMonthTitle");
   if (titleEl) {
-    titleEl.innerHTML = `<i class="fa-regular fa-calendar"></i> ${year}년 ${month + 1}월 학사일정`;
+    titleEl.innerHTML = `<i class="fa-regular fa-calendar"></i> ${year}년 ${month + 1}월`;
+  }
+
+  const badgeEl = document.getElementById("calendarMonthBadge");
+  if (badgeEl) {
+    badgeEl.textContent = `${month + 1}월 학사일정`;
   }
 
   const daysGrid = document.getElementById("calendarDaysGrid");
@@ -339,7 +464,7 @@ function renderFixedMonthCalendar() {
     daysGrid.innerHTML += `<div class="cal-day-cell other-month">${dayNum}</div>`;
   }
 
-  // 이번 달(10월) 날짜 채우기
+  // 이번 달 날짜 채우기
   for (let i = 1; i <= lastDay; i++) {
     const dateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(i).padStart(2, "0")}`;
     const isToday = isCurrentMonth && today.getDate() === i;
@@ -380,7 +505,6 @@ function renderFixedMonthCalendar() {
 
     // 날짜 클릭 이벤트: 우측 박스에 즉시 렌더링
     cell.addEventListener("click", () => {
-      // 모든 셀에서 selected 제거 후 현재 셀에 추가
       const allCells = daysGrid.querySelectorAll(".cal-day-cell");
       allCells.forEach(c => c.classList.remove("selected"));
       cell.classList.add("selected");
@@ -430,7 +554,7 @@ function renderSelectedDateDetails(dateStr) {
           <i class="fa-regular fa-calendar-check"></i>
         </div>
         <h4>예정된 평가 일정이 없습니다</h4>
-        <p>${month}월 ${day}일에는 모의고사 및 수행 일정이 없습니다.<br>정규 수업에 집중하고 편안한 하루를 보내세요! 🌿</p>
+        <p>${month}월 ${day}일에는 등록된 시험 및 수행 일정이 없습니다.<br>정규 수업에 집중하고 편안한 하루를 보내세요! 🌿</p>
       </div>
     `;
     return;

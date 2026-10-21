@@ -209,12 +209,70 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
   margin-bottom: 1.2rem;
+}
+
+.calendar-header-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
 }
 
 .calendar-title {
   font-size: 1.25rem;
   font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.calendar-nav-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.cal-nav-btn {
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-full);
+  background-color: var(--bg-subtle);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.cal-nav-btn:hover {
+  background-color: var(--primary-light);
+  color: var(--primary-dark);
+  border-color: #bcd4c3;
+  transform: translateY(-1px);
+}
+
+.cal-nav-today-btn {
+  padding: 0.22rem 0.65rem;
+  font-size: 0.76rem;
+  font-weight: 700;
+  border-radius: var(--radius-full);
+  background-color: var(--bg-subtle);
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.cal-nav-today-btn:hover {
+  background-color: var(--primary-light);
+  color: var(--primary-dark);
+  border-color: #bcd4c3;
 }
 
 .icon-btn {
@@ -329,6 +387,18 @@
   background-color: #64748b;
 }
 
+.cal-cat-dot.dot-festival {
+  background-color: #8b5cf6;
+}
+
+.cal-cat-dot.dot-vacation {
+  background-color: #0284c7;
+}
+
+.cal-cat-dot.dot-blood {
+  background-color: #e11d48;
+}
+
 /* D-Day 카드 내부 카테고리 행 */
 .dday-cat-row {
   margin-bottom: 0.35rem;
@@ -344,6 +414,18 @@
 
 .dday-card.cat-school-event {
   border-left: 4px solid #64748b;
+}
+
+.dday-card.cat-festival {
+  border-left: 4px solid #8b5cf6;
+}
+
+.dday-card.cat-vacation {
+  border-left: 4px solid #0284c7;
+}
+
+.dday-card.cat-blood {
+  border-left: 4px solid #e11d48;
 }
 
 /* 카테고리 태그 뱃지 공통 */
@@ -374,6 +456,24 @@
   background-color: #f1f5f9;
   color: #475569;
   border: 1px solid #cbd5e1;
+}
+
+.sched-cat-tag.badge-festival {
+  background-color: #f5f3ff;
+  color: #7c3aed;
+  border: 1px solid #ddd6fe;
+}
+
+.sched-cat-tag.badge-vacation {
+  background-color: #f0f9ff;
+  color: #0284c7;
+  border: 1px solid #bae6fd;
+}
+
+.sched-cat-tag.badge-blood {
+  background-color: #fff1f2;
+  color: #e11d48;
+  border: 1px solid #fecdd3;
 }
 
 /* ========================================================
@@ -470,6 +570,21 @@
 .selected-detail-card.cat-school-event {
   border-left-color: #64748b;
   background: linear-gradient(135deg, #f8fafc, #ffffff);
+}
+
+.selected-detail-card.cat-festival {
+  border-left-color: #8b5cf6;
+  background: linear-gradient(135deg, #faf5ff, #ffffff);
+}
+
+.selected-detail-card.cat-vacation {
+  border-left-color: #0284c7;
+  background: linear-gradient(135deg, #f0f9ff, #ffffff);
+}
+
+.selected-detail-card.cat-blood {
+  border-left-color: #e11d48;
+  background: linear-gradient(135deg, #fff1f2, #ffffff);
 }
 
 .detail-card-header {

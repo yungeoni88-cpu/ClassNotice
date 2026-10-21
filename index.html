@@ -10,8 +10,8 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
   <!-- CSS 분리 구조: 공통 베이스 스타일 & 카테고리별 컨텐츠 스타일 -->
-  <link rel="stylesheet" href="css/common.css?v=18">
-  <link rel="stylesheet" href="css/content.css?v=18">
+  <link rel="stylesheet" href="css/common.css?v=19">
+  <link rel="stylesheet" href="css/content.css?v=19">
 </head>
 <body>
   <!-- 상단 풀와이드 헤더 & 글로벌 네비게이션 (와이드 배너 디자인) -->
@@ -164,8 +164,15 @@
         <!-- 미니 캘린더 -->
         <div class="card-box calendar-box">
           <div class="calendar-header">
-            <h3 id="calendarMonthTitle" class="calendar-title"><i class="fa-regular fa-calendar"></i> 2026년 10월</h3>
-            <span class="month-fixed-badge" style="background:var(--primary-light); color:var(--primary-dark); font-size:0.8rem; font-weight:700; padding:0.25rem 0.65rem; border-radius:var(--radius-full); border:1px solid #bcd4c3;">10월 학사일정</span>
+            <div class="calendar-header-title-wrap">
+              <h3 id="calendarMonthTitle" class="calendar-title"><i class="fa-regular fa-calendar"></i> 2026년 10월</h3>
+              <span id="calendarMonthBadge" class="month-fixed-badge" style="background:var(--primary-light); color:var(--primary-dark); font-size:0.8rem; font-weight:700; padding:0.25rem 0.65rem; border-radius:var(--radius-full); border:1px solid #bcd4c3;">10월 학사일정</span>
+            </div>
+            <div class="calendar-nav-controls">
+              <button id="calPrevMonthBtn" class="cal-nav-btn" title="이전 달" type="button"><i class="fa-solid fa-chevron-left"></i></button>
+              <button id="calTodayBtn" class="cal-nav-today-btn" title="오늘 달로 이동" type="button">오늘</button>
+              <button id="calNextMonthBtn" class="cal-nav-btn" title="다음 달" type="button"><i class="fa-solid fa-chevron-right"></i></button>
+            </div>
           </div>
           <div class="calendar-weekdays">
             <span class="sun">일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span class="sat">토</span>
@@ -462,11 +469,11 @@
 
   <!-- 자바스크립트 분리 로드 -->
   <!-- 카테고리별 독립 로직 (데이터 & 기능) -->
-  <script src="js/notice.js?v=18"></script>
-  <script src="js/schedule.js?v=18"></script>
-  <script src="js/meal.js?v=18"></script>
-  <script src="js/etc.js?v=18"></script>
+  <script src="js/notice.js?v=19"></script>
+  <script src="js/schedule.js?v=19"></script>
+  <script src="js/meal.js?v=19"></script>
+  <script src="js/etc.js?v=19"></script>
   <!-- 메인 컨트롤러 (탭 전환 및 전체 초기화) -->
-  <script src="js/main.js?v=18"></script>
+  <script src="js/main.js?v=19"></script>
 </body>
 </html>
