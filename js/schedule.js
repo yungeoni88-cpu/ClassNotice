@@ -26,7 +26,7 @@ const calendarEvents = [
   { date: "2026-10-23", title: "영어 발표와 토론 수행 2차시" },
   { date: "2026-10-23", title: "화법과 언어 수행 1차시" },
   { date: "2026-10-26", title: "영어 발표와 토론 수행 3차시" },
-  { date: "2026-10-26", title: "스포츠 문화(농구)" },
+  { date: "2026-10-26", title: "스포츠 문화(농구) 수행" },
   { date: "2026-10-27", title: "영어 발표와 토론 수행 4차시" },
   { date: "2026-10-28", title: "현장체험학습" },
   { date: "2026-10-30", title: "화법과 언어 수행 2차시" },
@@ -150,7 +150,7 @@ function getEventCategory(title) {
     };
   }
 
-  if (safeTitle.includes("수행")) {
+  if (safeTitle.includes("수행") || safeTitle.includes("스포츠 문화")) {
     return {
       key: "performance",
       name: "수행",
