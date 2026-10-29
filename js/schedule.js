@@ -34,6 +34,7 @@ const calendarEvents = [
   // 11월 일정
   { date: "2026-11-06", title: "화법과 언어 수행 3차시" },
   { date: "2026-11-13", title: "화법과 언어 수행 4차시" },
+  { date: "2026-11-13", title: "체육 보고서 마감일" },
   { date: "2026-11-19", title: "대학수학능력시험 (등교X)" },
 
   // 12월 일정
@@ -171,6 +172,23 @@ function getEventCategory(title) {
       itemClass: "cat-festival",
       dotClass: "dot-festival",
       themeColor: "#8b5cf6"
+    };
+  }
+
+  if (safeTitle.includes("보고서") || safeTitle.includes("과제") || safeTitle.includes("마감")) {
+    let catName = "보고서";
+    if (safeTitle.includes("보고서")) catName = "보고서";
+    else if (safeTitle.includes("과제")) catName = "과제";
+    else if (safeTitle.includes("마감")) catName = "마감";
+
+    return {
+      key: "assignment",
+      name: catName,
+      icon: "fa-solid fa-file-circle-check",
+      badgeClass: "badge-assignment",
+      itemClass: "cat-assignment",
+      dotClass: "dot-assignment",
+      themeColor: "#16a34a"
     };
   }
 
