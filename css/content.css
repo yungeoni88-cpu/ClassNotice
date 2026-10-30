@@ -1454,6 +1454,118 @@
   font-size: 1rem;
 }
 
+/* 우리반 급훈 하단 - 일본어 단어시험 바로가기 배너 틀 */
+.jp-quiz-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.85rem 1rem;
+  background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%);
+  border: 1.5px solid #86efac;
+  border-left: 5px solid #16a34a;
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  color: inherit;
+  transition: all var(--transition-fast);
+  box-shadow: var(--shadow-sm);
+  margin-top: auto;
+  cursor: pointer;
+}
+
+.jp-quiz-banner:hover {
+  background: linear-gradient(135deg, #dcfce7 0%, #f0fdf4 100%);
+  border-color: #22c55e;
+  border-left-color: #15803d;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.jp-quiz-banner-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-sm);
+  background-color: #ffffff;
+  border: 1px solid #bbf7d0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  color: #16a34a;
+  flex-shrink: 0;
+  box-shadow: 0 2px 4px rgba(22, 163, 74, 0.1);
+  transition: all var(--transition-fast);
+}
+
+.jp-quiz-banner:hover .jp-quiz-banner-icon {
+  transform: scale(1.06) rotate(-3deg);
+  background-color: #16a34a;
+  color: #ffffff;
+  border-color: #16a34a;
+}
+
+.jp-quiz-banner-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.jp-quiz-banner-header {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+}
+
+.jp-quiz-tag {
+  font-size: 0.68rem;
+  font-weight: 800;
+  padding: 0.12rem 0.45rem;
+  border-radius: var(--radius-full);
+  background-color: #dcfce7;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+  line-height: 1.2;
+}
+
+.jp-quiz-title {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #14532d;
+  letter-spacing: -0.02em;
+}
+
+.jp-quiz-desc {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  line-height: 1.3;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.jp-quiz-banner-arrow {
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-full);
+  background-color: rgba(22, 163, 74, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  color: #16a34a;
+  flex-shrink: 0;
+  transition: all var(--transition-fast);
+}
+
+.jp-quiz-banner:hover .jp-quiz-banner-arrow {
+  background-color: #16a34a;
+  color: #ffffff;
+  transform: translate(2px, -2px);
+}
+
 /* 주요 학습 사이트 (세로 카드 리스트) */
 .quick-links-vertical {
   display: flex;
