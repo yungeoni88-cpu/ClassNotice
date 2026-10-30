@@ -5,13 +5,19 @@
 
 /* --------------------------------------------------------
    1. 공지사항 (Notice) 컴포넌트
-   - 가로 3개 동일 너비 박스 (시간표, 급훈&약속, 주요 학습 사이트)
+   - 가로 3열 레이아웃: 왼쪽(시간표), 중간(위:급훈, 아래:일본어), 오른쪽(학습사이트)
    -------------------------------------------------------- */
 .notice-trio-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 1.25rem;
   align-items: stretch;
+}
+
+.notice-center-col {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
 }
 
 @media (max-width: 900px) {
@@ -1407,24 +1413,28 @@
   font-weight: 700;
 }
 
-/* 급훈 및 규칙 */
+/* 급훈 및 규칙 (중간 열 상단 카드) */
+.motto-box {
+  display: flex;
+  flex-direction: column;
+}
+
 .motto-content-wrap {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  height: calc(100% - 2.2rem);
+  gap: 0.65rem;
 }
 
 .motto-quote {
-  font-size: 1.05rem;
+  font-size: 0.98rem;
   font-weight: 700;
   font-style: italic;
   color: var(--primary-dark);
   background-color: var(--primary-light);
-  padding: 1.1rem 1.2rem;
+  padding: 0.8rem 1rem;
   border-radius: var(--radius-md);
   border-left: 4px solid var(--primary-color);
-  line-height: 1.5;
+  line-height: 1.45;
   box-shadow: var(--shadow-sm);
 }
 
@@ -1432,19 +1442,18 @@
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-  flex: 1;
+  gap: 0.5rem;
 }
 
 .class-rules li {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
-  padding: 0.8rem 1rem;
+  gap: 0.55rem;
+  padding: 0.62rem 0.85rem;
   background-color: var(--bg-subtle);
   border-radius: var(--radius-md);
   border: 1px solid var(--border-color);
-  font-size: 0.9rem;
+  font-size: 0.86rem;
   font-weight: 600;
   color: var(--text-main);
 }
@@ -1454,25 +1463,19 @@
   font-size: 1rem;
 }
 
-/* 우리반 급훈 하단 - 일본어 단어시험 바로가기 배너 틀 */
-.jp-quiz-banner {
-  display: flex;
-  align-items: center;
-  gap: 0.85rem;
-  padding: 0.85rem 1rem;
+/* 일본어 단어시험 (중간 열 하단 독립 카드 박스) */
+.jp-quiz-card-box {
   background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%);
   border: 1.5px solid #86efac;
   border-left: 5px solid #16a34a;
-  border-radius: var(--radius-md);
-  text-decoration: none;
-  color: inherit;
+  padding: 1.15rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   transition: all var(--transition-fast);
-  box-shadow: var(--shadow-sm);
-  margin-top: auto;
-  cursor: pointer;
 }
 
-.jp-quiz-banner:hover {
+.jp-quiz-card-box:hover {
   background: linear-gradient(135deg, #dcfce7 0%, #f0fdf4 100%);
   border-color: #22c55e;
   border-left-color: #15803d;
@@ -1480,48 +1483,58 @@
   box-shadow: var(--shadow-md);
 }
 
-.jp-quiz-banner-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: var(--radius-sm);
+.jp-quiz-link-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  text-decoration: none;
+  color: inherit;
+  width: 100%;
+}
+
+.jp-quiz-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.jp-quiz-card-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.jp-quiz-icon-badge {
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius-md);
   background-color: #ffffff;
-  border: 1px solid #bbf7d0;
+  border: 1.5px solid #bbf7d0;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.2rem;
+  font-size: 1.25rem;
   color: #16a34a;
   flex-shrink: 0;
-  box-shadow: 0 2px 4px rgba(22, 163, 74, 0.1);
+  box-shadow: 0 2px 5px rgba(22, 163, 74, 0.12);
   transition: all var(--transition-fast);
 }
 
-.jp-quiz-banner:hover .jp-quiz-banner-icon {
-  transform: scale(1.06) rotate(-3deg);
+.jp-quiz-card-box:hover .jp-quiz-icon-badge {
+  transform: scale(1.08) rotate(-4deg);
   background-color: #16a34a;
   color: #ffffff;
   border-color: #16a34a;
 }
 
-.jp-quiz-banner-content {
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-  flex: 1;
-  min-width: 0;
-}
-
-.jp-quiz-banner-header {
-  display: flex;
-  align-items: center;
-  gap: 0.45rem;
-  flex-wrap: wrap;
+.jp-quiz-tag-line {
+  margin-bottom: 0.15rem;
 }
 
 .jp-quiz-tag {
   font-size: 0.68rem;
   font-weight: 800;
-  padding: 0.12rem 0.45rem;
+  padding: 0.12rem 0.48rem;
   border-radius: var(--radius-full);
   background-color: #dcfce7;
   color: #15803d;
@@ -1529,41 +1542,75 @@
   line-height: 1.2;
 }
 
-.jp-quiz-title {
-  font-size: 0.95rem;
+.jp-quiz-main-title {
+  font-size: 1.05rem;
   font-weight: 800;
   color: #14532d;
   letter-spacing: -0.02em;
-}
-
-.jp-quiz-desc {
-  font-size: 0.78rem;
-  color: var(--text-muted);
-  line-height: 1.3;
   margin: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
-.jp-quiz-banner-arrow {
-  width: 30px;
-  height: 30px;
+.jp-quiz-card-arrow-wrap {
+  width: 32px;
+  height: 32px;
   border-radius: var(--radius-full);
   background-color: rgba(22, 163, 74, 0.08);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   color: #16a34a;
   flex-shrink: 0;
   transition: all var(--transition-fast);
 }
 
-.jp-quiz-banner:hover .jp-quiz-banner-arrow {
+.jp-quiz-card-box:hover .jp-quiz-card-arrow-wrap {
   background-color: #16a34a;
   color: #ffffff;
   transform: translate(2px, -2px);
+}
+
+.jp-quiz-card-desc {
+  font-size: 0.82rem;
+  color: #374151;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.jp-quiz-card-footer {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+  padding-top: 0.35rem;
+  border-top: 1px dashed #bbf7d0;
+}
+
+.jp-quiz-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #15803d;
+  background-color: #ffffff;
+  padding: 0.2rem 0.55rem;
+  border-radius: var(--radius-full);
+  border: 1px solid #bbf7d0;
+}
+
+.jp-quiz-action-text {
+  margin-left: auto;
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: #16a34a;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.jp-quiz-card-box:hover .jp-quiz-action-text {
+  color: #15803d;
 }
 
 /* 주요 학습 사이트 (세로 카드 리스트) */
