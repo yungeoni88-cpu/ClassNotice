@@ -75,6 +75,32 @@ let timetableTimer = null; // 실시간 프로그레스 타이머
 // 공지사항 모듈 초기화
 function initNoticeModule() {
   initTimetableModule();
+  initJpQuizSchedule();
+}
+
+/**
+ * ⏰ [일본어 단어시험 카드 예약 노출 기능]
+ * - 사용자 요청: 현재는 잠시 삭제/숨김 처리
+ * - 자동 노출 시각: 2026년 11월 3일 오전 09:20 (KST) 이후 사이트에 자동으로 복원 노출
+ */
+const JP_QUIZ_RELEASE_TIMESTAMP = new Date("2026-11-03T09:20:00+09:00").getTime();
+
+function initJpQuizSchedule() {
+  checkJpQuizVisibility();
+  // 페이지를 켜둔 상태에서도 9시 20분이 되면 즉시 자동으로 나타나도록 5초마다 체크
+  setInterval(checkJpQuizVisibility, 5000);
+}
+
+function checkJpQuizVisibility() {
+  const card = document.getElementById("jpQuizCardBox");
+  if (!card) return;
+
+  const now = Date.now();
+  if (now >= JP_QUIZ_RELEASE_TIMESTAMP) {
+    card.style.display = "flex";
+  } else {
+    card.style.display = "none";
+  }
 }
 
 /**
