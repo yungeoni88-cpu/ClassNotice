@@ -36,6 +36,8 @@ const calendarEvents = [
   { date: "2026-11-13", title: "화법과 언어 수행 4차시" },
   { date: "2026-11-13", title: "체육 보고서 마감일" },
   { date: "2026-11-13", title: "역학과 에너지 수행" },
+  { date: "2026-11-17", title: "미적분II 수행" },
+  { date: "2026-11-17", title: "확률과 통계 수행" },
   { date: "2026-11-19", title: "대학수학능력시험 (등교X)" },
 
   // 12월 일정
@@ -152,7 +154,7 @@ function getEventCategory(title) {
     };
   }
 
-  if (safeTitle.includes("수행") || safeTitle.includes("스포츠 문화") || safeTitle.includes("역학과 에너지")) {
+  if (safeTitle.includes("수행") || safeTitle.includes("스포츠 문화") || safeTitle.includes("역학과 에너지") || safeTitle.includes("미적분") || safeTitle.includes("확률과 통계")) {
     return {
       key: "performance",
       name: "수행",
